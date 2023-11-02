@@ -1,0 +1,42 @@
+import CustomExcpetions.InvalidNotationException;
+import CustomExcpetions.NumericalException;
+
+public class ChemicalSpecie {
+   private double molarMass;
+   private String name;
+   public ChemicalSpecie(double molarMass, String name) throws InvalidNotationException, NumericalException {
+      if(name == null || name.isEmpty()) {
+         throw new InvalidNotationException("Name of chemical specie must be specified.");
+      }
+      if(molarMass <= 0) {
+         throw new NumericalException("Invalid molar mass value. Molar mass must be greater then 0.");
+      }
+      this.molarMass = molarMass;
+      this.name = name;
+   }
+   public ChemicalSpecie(ChemicalSpecie source) {
+      this.name = source.name;
+      this.molarMass = source.molarMass;
+   }
+   public ChemicalSpecie clone() {
+      return new ChemicalSpecie(this);
+   }
+   public double getMolarMass() { return this.molarMass; }
+   public void setMolarMass(double molarMass) throws NumericalException {
+      if(molarMass <= 0) {
+         throw new NumericalException("Invalid molar mass value. Molar mass must be greater then 0.");
+      }
+      this.molarMass = molarMass;
+   }
+   public String getName() { return this.name; }
+   public void setString(String name) throws InvalidNotationException {
+      if(name == null || name.isEmpty()) {
+         throw new InvalidNotationException("Name of chemical specie must be specified.");
+      }
+      this.name = name;
+   }
+   public boolean equals(Object comparator) {
+      if(comparator == null || comparator.getClass() != this.getClass()) return false;
+      return this.name.equals(((ChemicalSpecie) comparator).name) && this.molarMass == ((ChemicalSpecie) comparator).molarMass;
+   }
+}
