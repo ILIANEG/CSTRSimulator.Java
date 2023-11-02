@@ -1,9 +1,9 @@
 import CustomExcpetions.*;
 
 public class ChemicalComposition {
-    private ChemicalSpecie[] species;
+    private ChemicalSpecies[] species;
     private double[] concentrations; // Concentration in mole/m^3
-    public ChemicalComposition(ChemicalSpecie[] species, double[] concentrations) throws ArrayException {
+    public ChemicalComposition(ChemicalSpecies[] species, double[] concentrations) throws ArrayException {
         if(species == null) {
             throw new ArrayException("List of chemical species was found to be null while " +
                     "initializing ChemicalComposition object.", new NullPointerException("Array species is null"));
@@ -16,7 +16,7 @@ public class ChemicalComposition {
             throw new ArrayException("Chemical species array does not match the length of concentration array.",
                     new LengthMismatch("Related arrays' lengths mismatch.", species.length, concentrations.length));
         }
-        ChemicalSpecie[] tempSpecies = new ChemicalSpecie[species.length];
+        ChemicalSpecies[] tempSpecies = new ChemicalSpecies[species.length];
         double[] tempConcentration = new double[concentrations.length];
         for(int i = 0; i < species.length; i++) {
             if(species[i] == null) throw new ArrayException("Specie at index "+ i+" is invalid.", new InvalidArrayDataException(i));
@@ -30,7 +30,7 @@ public class ChemicalComposition {
     }
     public ChemicalComposition(ChemicalComposition source) throws NullPointerException {
         if(source == null) throw new NullPointerException("Source object in ChemicalComposition copy constructor is null.");
-        this.species = new ChemicalSpecie[source.species.length];
+        this.species = new ChemicalSpecies[source.species.length];
         this.concentrations = new double[source.concentrations.length];
         for(int i = 0; i < source.species.length; i++) {
             this.species[i] = source.species[i].clone();
@@ -40,8 +40,8 @@ public class ChemicalComposition {
     public ChemicalComposition clone() {
         return new ChemicalComposition(this);
     }
-    public ChemicalSpecie[] getSpecies() {
-        ChemicalSpecie[] tempSpecies = new ChemicalSpecie[this.species.length];
+    public ChemicalSpecies[] getSpecies() {
+        ChemicalSpecies[] tempSpecies = new ChemicalSpecies[this.species.length];
         for(int i = 0; i < this.species.length; i++) {
             tempSpecies[i] = this.species[i].clone();
         }
@@ -54,7 +54,7 @@ public class ChemicalComposition {
         }
         return tempConcentrations;
     }
-    public double getConcentration(ChemicalSpecie specie) {
+    public double getConcentration(ChemicalSpecies specie) {
         for(int i = 0; i < this.species.length; i++) {
             if(specie.equals(this.species[i])) return concentrations[i];
         }
@@ -66,7 +66,7 @@ public class ChemicalComposition {
         }
         return 0;
     }
-    public boolean containsSpecie(ChemicalSpecie specie) {
+    public boolean containsSpecie(ChemicalSpecies specie) {
         for(int i = 0; i < this.species.length; i++) {
             if(this.species[i].equals(specie)) return true;
         }
@@ -78,10 +78,10 @@ public class ChemicalComposition {
         }
         return false;
     }
-    public void addSpecie(ChemicalSpecie specie, double concentration) throws NullPointerException, NumericalException {
+    public void addSpecie(ChemicalSpecies specie, double concentration) throws NullPointerException, NumericalException {
         if(specie == null) throw new NullPointerException("Adding a null specie to ChemicalComposition object.");
         if(concentration < 0) throw new NumericalException("Assigning negative concentration in ChemicalComposition object.");
-        ChemicalSpecie[] species = new ChemicalSpecie[this.species.length + 1];
+        ChemicalSpecies[] species = new ChemicalSpecies[this.species.length + 1];
         double[] concentrations = new double[this.concentrations.length + 1];
         for(int i = 0; i < this.species.length; i++) {
             species[i] = this.species[i].clone();
