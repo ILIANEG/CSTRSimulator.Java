@@ -29,7 +29,7 @@ public class ChemicalSpecies {
       this.molarMass = molarMass;
    }
    public String getName() { return this.name; }
-   public void setString(String name) throws InvalidNotationException {
+   public void setName(String name) throws InvalidNotationException {
       if(name == null || name.isEmpty()) {
          throw new InvalidNotationException("Name of chemical specie must be specified.");
       }
