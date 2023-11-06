@@ -2,6 +2,7 @@ package CHG4343_Design_Project_DataStorage;
 
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.EmptyArray;
+import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
 
 public class NumericalDataStorage {
     public final String[] headers;
@@ -39,6 +40,9 @@ public class NumericalDataStorage {
     public void addDataRow(double[] dataRow) throws ArrayException {
         if(dataRow == null) throw new ArrayException("Empty data is added to the Numerical Data Storage",
                 new NullPointerException("Data row in Numerical Data Storage is null"));
+        if(this.headers.length != dataRow.length) throw new ArrayException("Attempting to add a data row that does not match headers",
+                new LengthMismatch("dataRow array has length of ["+ dataRow.length+"], while headers array have length of [" +this.headers.length+"]",
+                dataRow.length, this.headers.length));
         double[][] tmpNumericalData = new double[this.numericalData.length+1][this.headers.length];
         for(int i = 0; i < this.numericalData.length; i++) {
             for(int j = 0; j < this.numericalData[i].length; j++) {

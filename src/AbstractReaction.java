@@ -80,7 +80,9 @@ public abstract class AbstractReaction {
     abstract public double calculateReactionRate(ChemicalMixture chemicalComposition);
 
     public double calculateNetReactionRate(ChemicalMixture chemicalComposition, AbstractReaction reverseReaction) {
-        return this.calculateReactionRate(chemicalComposition) - reverseReaction.calculateReactionRate(chemicalComposition);
+        if(chemicalComposition == null) return 0;
+        else if(reverseReaction == null) return this.calculateReactionRate(chemicalComposition);
+        else return this.calculateReactionRate(chemicalComposition) - reverseReaction.calculateReactionRate(chemicalComposition);
     }
     //Custom validator
     private static void validateData(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactantsStoichiometry,
