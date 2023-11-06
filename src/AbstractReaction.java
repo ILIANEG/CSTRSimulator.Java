@@ -28,10 +28,55 @@ public abstract class AbstractReaction {
         this.rateConstant = rateConstant;
 
     }
-
     //Copy constructor
-    //Mutator
-    //Equals
+    public AbstractReaction(AbstractReaction source) throws NullPointerException {
+        if(source == null) throw new NullPointerException("Source object in copy constructor of Reaction is null");
+        this.reactants = new ChemicalSpecies[source.reactants.length];
+        this.products = new ChemicalSpecies[source.products.length];
+        this.reactantsStoichiometry = new double[source.reactantsStoichiometry.length];
+        this.productsStoichiometry = new double[source.productsStoichiometry.length];
+        for(int i = 0; i < this.reactants.length; i++) {
+            this.reactants[i] = source.reactants[i].clone();
+            this.reactantsStoichiometry[i] = source.reactantsStoichiometry[i];
+        }
+        for(int i = 0; i < this.products.length; i++) {
+            this.products[i] = source.products[i].clone();
+            this.productsStoichiometry[i] = source.productsStoichiometry[i];
+        }
+        this.rateConstant = source.rateConstant;
+    }
+    abstract public AbstractReaction clone();
+    public ChemicalSpecies[] getReactants() {
+        ChemicalSpecies[] tmpReactants = new ChemicalSpecies[this.reactants.length];
+        for(int i = 0; i < this.reactants.length; i++) {
+            tmpReactants[i] = this.reactants[i].clone();
+        }
+        return tmpReactants;
+    }
+    public ChemicalSpecies[] getProducts() {
+        ChemicalSpecies[] tmpProducts = new ChemicalSpecies[this.products.length];
+        for(int i = 0; i < this.products.length; i++) {
+            tmpProducts[i] = this.products[i].clone();
+        }
+        return tmpProducts;
+    }
+    public double[] getReactantsStoichiometry() {
+        double[] tmpReactantsStoichiometry = new double[this.reactantsStoichiometry.length];
+        for(int i = 0; i < this.reactantsStoichiometry.length; i++) {
+            tmpReactantsStoichiometry[i] = this.reactantsStoichiometry[i];
+        }
+        return tmpReactantsStoichiometry;
+    }
+    public double[] getProductsStoichiometry() {
+        double[] tmpProductsStoichiometry = new double[this.reactantsStoichiometry.length];
+        for(int i = 0; i < this.productsStoichiometry.length; i++) {
+            tmpProductsStoichiometry[i] = this.productsStoichiometry[i];
+        }
+        return tmpProductsStoichiometry;
+    }
+    public double getRateConstant() {
+        return rateConstant;
+    }
     abstract public double calculateReactionRate(ChemicalMixture chemicalComposition);
 
     public double calculateNetReactionRate(ChemicalMixture chemicalComposition, AbstractReaction reverseReaction) {
