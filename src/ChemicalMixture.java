@@ -1,4 +1,4 @@
-import CustomExcpetions.*;
+import CHG4343_Design_Project_CustomExcpetions.*;
 
 public class ChemicalMixture {
     private ChemicalSpecies[] species;

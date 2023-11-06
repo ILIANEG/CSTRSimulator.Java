@@ -1,4 +1,4 @@
-package CustomExcpetions;
+package CHG4343_Design_Project_CustomExcpetions;
 
 public class LengthMismatch extends Throwable {
     int arrayLength;

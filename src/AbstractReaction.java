@@ -1,7 +1,7 @@
-import CustomExcpetions.ArrayException;
-import CustomExcpetions.InvalidArrayDataException;
-import CustomExcpetions.LengthMismatch;
-import CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_CustomExcpetions.ArrayException;
+import CHG4343_Design_Project_CustomExcpetions.InvalidArrayDataException;
+import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
+import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 public abstract class AbstractReaction {
     private ChemicalSpecies[] reactants;

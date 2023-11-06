@@ -1,5 +1,5 @@
-import CustomExcpetions.ArrayException;
-import CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_CustomExcpetions.ArrayException;
+import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 public class ElementaryReaction extends AbstractReaction {
     public ElementaryReaction(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactantsStochiometry,

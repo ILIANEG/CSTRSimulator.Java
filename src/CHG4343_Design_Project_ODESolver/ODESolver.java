@@ -1,4 +1,4 @@
-package ODESolver;
+package CHG4343_Design_Project_ODESolver;
 public class ODESolver
 {		
 	public static double[] integrate(double xStart, double yStart, Function dydx, double[] xReport, double h, int maxIterations, ODEStepper stepper)

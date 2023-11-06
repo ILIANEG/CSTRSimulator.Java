@@ -1,5 +1,5 @@
-import CustomExcpetions.InvalidNotationException;
-import CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_CustomExcpetions.InvalidNotationException;
+import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 public class ChemicalSpecies {
    private double molarMass;

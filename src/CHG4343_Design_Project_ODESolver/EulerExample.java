@@ -1,4 +1,4 @@
-package ODESolver;
+package CHG4343_Design_Project_ODESolver;
 
 import java.text.*;
 import java.util.*;

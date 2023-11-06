@@ -1,4 +1,4 @@
-import CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 public class Flow {
     private ChemicalMixture mixture;

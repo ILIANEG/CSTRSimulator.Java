@@ -1,4 +1,4 @@
-package ODESolver;
+package CHG4343_Design_Project_ODESolver;
 public class SampleODE implements Function{
     private double a;
     private double b;
