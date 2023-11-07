@@ -1,6 +1,7 @@
+import CHG4343_Design_Project_ControlSystem.Controllable;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
-public class Flow {
+public class Flow implements Controllable {
     private ChemicalMixture mixture;
     private double volumetricFlowrate; //m^3/s
     public Flow(ChemicalMixture mixture, double volumetricFlowrate) throws NullPointerException, NumericalException {
@@ -51,4 +52,12 @@ public class Flow {
         return mixture.calculateMolesSolute(species, this.volumetricFlowrate);
     }
 
+    @Override
+    public void adjustControllableParameter(double value) {
+        this.setVolumetricFlowrate(value);
+    }
+    @Override
+    public double getControllableParameter() {
+        return this.volumetricFlowrate;
+    }
 }

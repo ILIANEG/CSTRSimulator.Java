@@ -78,12 +78,6 @@ public abstract class AbstractReaction {
         return rateConstant;
     }
     abstract public double calculateReactionRate(ChemicalMixture chemicalComposition);
-
-    public double calculateNetReactionRate(ChemicalMixture chemicalComposition, AbstractReaction reverseReaction) {
-        if(chemicalComposition == null) return 0;
-        else if(reverseReaction == null) return this.calculateReactionRate(chemicalComposition);
-        else return this.calculateReactionRate(chemicalComposition) - reverseReaction.calculateReactionRate(chemicalComposition);
-    }
     //Custom validator
     private static void validateData(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactantsStoichiometry,
                                      double[] productsStoichiometry, double rateConstant) throws ArrayException, NumericalException {
