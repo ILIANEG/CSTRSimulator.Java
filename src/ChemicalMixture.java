@@ -73,24 +73,51 @@ public class ChemicalMixture {
      */
     public double getConcentration(ChemicalSpecies species) {
         // Null does not need to be checked, is specie is null, 0 will be returned
-        for(int i = 0; i < this.species.length; i++) {
-            if(this.species[i].equals(species)) return this.concentrations[i];
-        }
+        if(this.containsSpecie(species)) return this.concentrations[this.getSpeciesIndex(species)];
         return 0;
     }
 
+    /**
+     * Method sets concentration of specie in the mixture.
+     * @param species Specie which concentration being altered.
+     * @param concentration New concentration to be set for a specie.
+     * @throws NumericalException If new concentration is negative.
+     */
+    public void setConcentration(ChemicalSpecies species, double  concentration) throws NumericalException {
+        if(concentration < 0) throw new NumericalException("Attempting to assign negative concentration to a species in ChemicalMixture object");
+        // Null does not need to be checked, is specie is null, 0 will be returned
+        if(this.containsSpecie(species)) this.concentrations[this.getSpeciesIndex(species)] = concentration;
+    }
+
+    /**
+     * Method that removes specie from the mixture.
+     * @param species ChemicalSpecies object.
+     */
+    public void removeSpecies(ChemicalSpecies species) {
+        if(this.containsSpecie(species)) {
+            int index = this.getSpeciesIndex(species);
+            ChemicalSpecies[] tmpSpecies = new ChemicalSpecies[this.species.length - 1];
+            double[] tmpConcentration = new double[this.concentrations.length - 1];
+            for(int i = 0, j = 0; i < this.species.length; i++, j++) {
+                if(i == index) j--;
+                else {
+                    tmpSpecies[j] = this.species[i].clone();
+                    tmpConcentration[j] = this.concentrations[i];
+                }
+            }
+            this.species = tmpSpecies;
+            this.concentrations = tmpConcentration;
+        }
+    }
     /**
      * Check if given specie is "announced" in the mixture (even if the specie has concentration = 0).
      * @param specie ChemicalSpecie object
      * @return Whether specie is announced in the mixture.
      */
     public boolean containsSpecie(ChemicalSpecies specie) {
-        for(int i = 0; i < this.species.length; i++) {
-            if(this.species[i].equals(specie)) return true;
-        }
-        return false;
+        if(this.getSpeciesIndex(specie) == -1) return false;
+        return true;
     }
-
     /**
      * addSpecies() method uses principal of List data structure to add new element to the mixture.
      * @param species ChemicalSpecie object to be added to the mixture.
@@ -98,6 +125,7 @@ public class ChemicalMixture {
      * @throws NullPointerException if ChemicalSpecies object is null.
      * @throws NumericalException if concentration is negative.
      */
+    // TODO: add check for same name of the species.
     public void addSpecies(ChemicalSpecies species, double concentration) throws NullPointerException, NumericalException {
         // Checking species for null.
         if(species == null) throw new NullPointerException("Adding a null specie to ChemicalComposition object.");
@@ -119,7 +147,7 @@ public class ChemicalMixture {
         this.concentrations = tmpConcentrations;
         this.species = tmpSpecies;
     }
-
+    // TODO: add check for same name of the species.
     /**
      * addMultipleSpecies() operates similarly to addSpecies() method, however adds multiple species at the same time.
      * @param species array of species objects to be added.
@@ -157,7 +185,15 @@ public class ChemicalMixture {
         }
         return true;
     }
-
+    @Override
+    public String toString() {
+        StringBuilder output = new StringBuilder();
+        for(int i = 0; i < this.species.length; i++) {
+            output.append("[").append(this.species[i].toString()).append("] = ").append(this.concentrations[i]);
+            if(i < this.species.length - 1) output.append("; ");
+        }
+        return output.toString();
+    }
     /**
      * Method calculateMolesSolute() calculate moles of solute in the mixture.
      * @param species ChemicalSpecie object.
@@ -167,6 +203,18 @@ public class ChemicalMixture {
     public double calculateMolesSolute(ChemicalSpecies species, double volume) {
         if(volume < 0) return 0;
         return this.getConcentration(species) * volume;
+    }
+
+    /**
+     * Helper method that finds index of a chemical specie.
+     * @param species ChemicalSpecie object.
+     * @return Index of a specie in the array, or -1 if specie is not in the array.
+     */
+    private int getSpeciesIndex(ChemicalSpecies species) {
+        for(int i = 0; i < this.species.length; i++) {
+            if(this.species[i].equals(species)) return i;
+        }
+        return -1;
     }
     /**
      * Helper (private class method) that validates data for the constructor or multiple species addition method.

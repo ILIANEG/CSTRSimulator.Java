@@ -51,4 +51,7 @@ public class ChemicalSpecies {
       if(comparator == null || comparator.getClass() != this.getClass()) return false;
       return this.name.equals(((ChemicalSpecies) comparator).name) && this.molarMass == ((ChemicalSpecies) comparator).molarMass;
    }
+   public String toString() {
+      return this.name;
+   }
 }

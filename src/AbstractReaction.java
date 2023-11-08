@@ -4,15 +4,26 @@ import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 public abstract class AbstractReaction {
-    private ChemicalSpecies[] reactants;
-    private ChemicalSpecies[] products;
-    private double[] reactantsStoichiometry; //Stored as positive values
-    private double[] productsStoichiometry; //Stored as positive values
-    private double rateConstant; //Positive value always (even if reaction can be seen as a reverse reaction of some arbitrary reaction)
-    //Constructor
+    // TODO prevent adding same species in reactants and products
+    /* All variables announced as final since they should not change over the lifetime of reaction object
+    * In other words, variables do not represent state, but rather "immutable characteristics" of the reaction. */
+    private final ChemicalSpecies[] reactants;
+    private final ChemicalSpecies[] products;
+    private final double[] reactantsStoichiometry; // Stored as negative values
+    private final double[] productsStoichiometry; // Stored as positive values
+
+    /**
+     *
+     * @param reactants Array of ChemicalSpecies representing reactants.
+     * @param products Array of ChemicalSpecies representing products.
+     * @param reactantsStoichiometry Array of doubles representing reactants stoichiometric ratios.
+     * @param productsStoichiometry Array of doubles representing product stoichiometric ratios.
+     * @throws ArrayException If an array or an element of the array is invalid.
+     */
     public AbstractReaction(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactantsStoichiometry,
-                            double[] productsStoichiometry, double rateConstant) throws ArrayException, NumericalException {
-        AbstractReaction.validateData(reactants, products, reactantsStoichiometry, productsStoichiometry, rateConstant);
+                            double[] productsStoichiometry) throws ArrayException {
+        // Data validation.
+        AbstractReaction.validateData(reactants, products, reactantsStoichiometry, productsStoichiometry);
         this.reactants = new ChemicalSpecies[reactants.length];
         this.products = new ChemicalSpecies[products.length];
         this.reactantsStoichiometry = new double[reactantsStoichiometry.length];
@@ -25,10 +36,8 @@ public abstract class AbstractReaction {
             this.products[i] = products[i].clone();
             this.productsStoichiometry[i] = productsStoichiometry[i];
         }
-        this.rateConstant = rateConstant;
 
     }
-    //Copy constructor
     public AbstractReaction(AbstractReaction source) throws NullPointerException {
         if(source == null) throw new NullPointerException("Source object in copy constructor of Reaction is null");
         this.reactants = new ChemicalSpecies[source.reactants.length];
@@ -43,9 +52,11 @@ public abstract class AbstractReaction {
             this.products[i] = source.products[i].clone();
             this.productsStoichiometry[i] = source.productsStoichiometry[i];
         }
-        this.rateConstant = source.rateConstant;
     }
     abstract public AbstractReaction clone();
+
+    /* Accessor and Mutators */
+
     public ChemicalSpecies[] getReactants() {
         ChemicalSpecies[] tmpReactants = new ChemicalSpecies[this.reactants.length];
         for(int i = 0; i < this.reactants.length; i++) {
@@ -74,13 +85,21 @@ public abstract class AbstractReaction {
         }
         return tmpProductsStoichiometry;
     }
-    public double getRateConstant() {
-        return rateConstant;
+    public double getStoichiometry(ChemicalSpecies species) {
+        for(int i = 0; i < this.products.length; i++) {
+            if(this.products[i].equals(species)) return this.productsStoichiometry[i];
+        }
+        for(int i = 0; i < this.reactants.length; i++) {
+            if(this.reactants[i].equals(species)) return this.reactantsStoichiometry[i];
+        }
+        return 0;
     }
-    abstract public double calculateReactionRate(ChemicalMixture chemicalComposition);
+    public abstract double getRateConstant();
+    public abstract double calculateRateConstant(double T);
+    public abstract double calculateReactionRate(ChemicalMixture chemicalComposition);
     //Custom validator
     private static void validateData(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactantsStoichiometry,
-                                     double[] productsStoichiometry, double rateConstant) throws ArrayException, NumericalException {
+                                     double[] productsStoichiometry) throws ArrayException {
         if (reactants == null) throw new ArrayException("List of reactants was found to be null in " +
                     "reaction object.", new NullPointerException("Array reactants is null"));
         if (products == null) throw new ArrayException("List of products was found to be null in " +
@@ -101,16 +120,15 @@ public abstract class AbstractReaction {
             if (reactants[i] == null)
                 throw new ArrayException("Reactant at index " + i + " is null.", new InvalidArrayDataException(i));
             //add here one for the others since they are arrays of objects
-            if (reactantsStoichiometry[i] < 0) throw new ArrayException("Stoichiometry at index " + i + " is invalid.",
-                    new InvalidArrayDataException(new NumericalException("Negative stoichiometry."), i));
+            if (0 < reactantsStoichiometry[i]) throw new ArrayException("Stoichiometry at index " + i + " is invalid.",
+                    new InvalidArrayDataException(new NumericalException("Positive stoichiometry value for reactants are not allowed."), i));
         }
         for (int i = 0; i < products.length; i++) {
             if (products[i] == null)
                 throw new ArrayException("Products at index " + i + " is null.", new InvalidArrayDataException(i));
             //add here one for the others since they are arrays of objects
             if (productsStoichiometry[i] < 0) throw new ArrayException("Stoichiometry at index " + i + " is invalid.",
-                    new InvalidArrayDataException(new NumericalException("Negative stoichiometry."), i));
+                    new InvalidArrayDataException(new NumericalException("Negative stoichiometry value for products are not allowed."), i));
         }
-        if(0 < rateConstant) throw new NumericalException("Negative rate constant");
     }
 }

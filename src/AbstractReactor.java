@@ -1,4 +1,4 @@
-import CHG4343_Design_Project_ControlSystem.AbstractController;
+import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 public abstract class AbstractReactor {
     /* Flows announced as protected since Flow objects might be accessed by reference to change the operating conditions.
@@ -8,7 +8,7 @@ public abstract class AbstractReactor {
     protected Flow g_Outlet;
     private AbstractReaction reaction;
     //Constructor for irreversible reaction
-    public AbstractReactor(Flow inlet, AbstractReaction reaction) throws NullPointerException {
+    public AbstractReactor(Flow inlet, AbstractReaction reaction) throws NullPointerException, NumericalException {
         if(inlet == null) throw new NullPointerException("Inlet was found to be null while initializing Reactor");
         if(reaction == null) throw new NullPointerException("Reaction was found to be null while initializing Reactor");
         this.inlet = inlet.clone();
@@ -49,8 +49,8 @@ public abstract class AbstractReactor {
     }
     abstract public AbstractReactor clone();
     // Running reactor for given amount of time (will end if steady state is achieved)
-    abstract public void run(int runTime, int timeStep);
+    public abstract void run(int timeStep, int runTime);
     // Running reactor till steady state is achieved
-    abstract public void run(int timeStep);
-    abstract protected void initializeOutletFlow();
+    public abstract void run(int timeStep);
+    protected abstract void initializeOutletFlow() throws NumericalException;
 }
