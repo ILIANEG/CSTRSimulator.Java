@@ -4,7 +4,8 @@ import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 public abstract class AbstractReaction {
-    // TODO prevent adding same species in reactants and products
+    /* TODO prevent adding same species in reactants and products
+    *  TODO add more detailed comments */
     /* All variables announced as final since they should not change over the lifetime of reaction object
     * In other words, variables do not represent state, but rather "immutable characteristics" of the reaction. */
     private final ChemicalSpecies[] reactants;
@@ -94,10 +95,12 @@ public abstract class AbstractReaction {
         }
         return 0;
     }
-    public abstract double getRateConstant();
-    public abstract double calculateRateConstant(double T);
-    public abstract double calculateReactionRate(ChemicalMixture chemicalComposition);
-    //Custom validator
+    public abstract double calculateRateConstant(ChemicalMixture mixture);
+    public abstract double calculateReactionRate(ChemicalMixture mixture);
+
+    /**
+     * Custom validator
+     */
     private static void validateData(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactantsStoichiometry,
                                      double[] productsStoichiometry) throws ArrayException {
         if (reactants == null) throw new ArrayException("List of reactants was found to be null in " +

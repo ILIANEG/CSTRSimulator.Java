@@ -3,6 +3,7 @@ import CHG4343_Design_Project_CustomExcpetions.*;
 public class ChemicalMixture {
     private ChemicalSpecies[] species;
     private double[] concentrations; // Concentration in mol/m^3.
+    private double temperature; // temperature of mixture in K.
 
     /**
      * Constructor for ChemicalSpecies class.
@@ -21,14 +22,23 @@ public class ChemicalMixture {
             this.species[i] = species[i].clone();
             this.concentrations[i] = concentrations[i];
         }
+        /* Setting default temperature since it is not relevant for the current project, instead it is relevant
+        * for non-isothermal reactor implementation if one implemented in the future. */
+        this.temperature = 273.15;
     }
-
+    public ChemicalMixture(ChemicalSpecies[] species, double[] concentrations, double temperature) throws ArrayException {
+        this(species, concentrations);
+        /* Setting default temperature since it is not relevant for the current project, instead it is relevant
+         * for non-isothermal reactor implementation if one implemented in the future. */
+        this.temperature = 273.15;
+    }
     /**
      * Constructor for an empty mixture (represents pure solvent).
      */
     public ChemicalMixture() {
         this.species = new ChemicalSpecies[0];
         this.concentrations = new double[0];
+        this.temperature = 273.15;
     }
     public ChemicalMixture(ChemicalMixture source) throws NullPointerException {
         if(source == null) throw new NullPointerException("Source object in ChemicalMixture copy constructor is null.");
@@ -60,12 +70,28 @@ public class ChemicalMixture {
         }
         return tempConcentrations;
     }
+    public double getTemperature() {
+        return this.temperature;
+    }
 
-    /* Setters are not provided for this class since it is a data structure.
+    /**
+     * set temperature of the Chemical Mixture.
+     * @param temperature Temperature, units: K.
+     * @throws NumericalException If Absolute temperature is less then or equal to zero.
+     */
+    public void setTemperature(double temperature) throws NumericalException {
+        if(temperature <= 0) throw new NumericalException("Absolute temperature can not be negative or zero");
+        this.temperature = temperature;
+    }
+
+    /* Some setters are not provided for this class since it is a data structure.
      * It should be able to store data and access it in a controlled manner.
-     * Other classes should be able to mutate this class in an "invasive way" (by reference).
+     * Other classes should be able to mutate fields of this class in an "invasive way" (by reference).
      * Method to manipulate this data structure are provided below. */
 
+    public int getNumberOfSpecies() {
+        return this.species.length;
+    }
     /**
      * Get concentration of particular specie
      * @param species ChemicalSpecies object.
@@ -78,17 +104,28 @@ public class ChemicalMixture {
     }
 
     /**
-     * Method sets concentration of specie in the mixture.
+     * Method sets concentration of specie in the mixture. Add species if the specie is not already in the mixture.
      * @param species Specie which concentration being altered.
      * @param concentration New concentration to be set for a specie.
      * @throws NumericalException If new concentration is negative.
      */
-    public void setConcentration(ChemicalSpecies species, double  concentration) throws NumericalException {
+    public void setConcentration(ChemicalSpecies species, double  concentration) throws NumericalException, NullPointerException {
         if(concentration < 0) throw new NumericalException("Attempting to assign negative concentration to a species in ChemicalMixture object");
         // Null does not need to be checked, is specie is null, 0 will be returned
         if(this.containsSpecie(species)) this.concentrations[this.getSpeciesIndex(species)] = concentration;
+        else this.addNewSpecies(species, concentration);
     }
 
+    /**
+     *
+     * @param species Specie which concentration being altered.
+     * @param concentration New concentration to be set for a specie.
+     * @throws NumericalException If amy concentration is negative
+     * @throws NullPointerException
+     */
+    public void addSpecie(ChemicalSpecies species, double  concentration) throws NumericalException {
+        this.setConcentration(species, concentration);
+    }
     /**
      * Method that removes specie from the mixture.
      * @param species ChemicalSpecies object.
@@ -125,8 +162,7 @@ public class ChemicalMixture {
      * @throws NullPointerException if ChemicalSpecies object is null.
      * @throws NumericalException if concentration is negative.
      */
-    // TODO: add check for same name of the species.
-    public void addSpecies(ChemicalSpecies species, double concentration) throws NullPointerException, NumericalException {
+    private void addNewSpecies(ChemicalSpecies species, double concentration) throws NullPointerException, NumericalException {
         // Checking species for null.
         if(species == null) throw new NullPointerException("Adding a null specie to ChemicalComposition object.");
         // Checking for negative concentration.
@@ -154,26 +190,9 @@ public class ChemicalMixture {
      * @param concentrations array of concentrations, units: mol/m^3.
      * @throws ArrayException if array or any of its elements are invalid.
      */
-    public void addMultipleSpecies(ChemicalSpecies[] species, double[] concentrations) throws ArrayException {
-        // Using validate method on arrays that were passed.
+    public void addMultipleSpecies(ChemicalSpecies[] species, double[] concentrations) throws ArrayException, NumericalException {
         ChemicalMixture.validateData(species, concentrations);
-        // Initializing temporary arrays of size to accommodate both original arrays and new arrays
-        ChemicalSpecies[] tempSpecies = new ChemicalSpecies[this.species.length+species.length];
-        double[] tempConcentrations = new double[this.concentrations.length+concentrations.length];
-        // Copying original arrays into temporary arrays
-        for(int i = 0; i < this.species.length; i++) {
-            // Yet again, copying by reference is safe since elements are coming from within the class.
-            tempSpecies[i] = this.species[i];
-            tempConcentrations[i] = this.concentrations[i];
-        }
-        // Copying new elements. This time species are deep-copied, since coming from outside the class.
-        for(int i = 0; i < species.length; i++) {
-            tempSpecies[i + this.species.length] = species[i].clone();
-            tempConcentrations[i + this.concentrations.length] = concentrations[i];
-        }
-        // Temporary arrays references are dumped into the instance variables.
-        this.species = tempSpecies;
-        this.concentrations = tempConcentrations;
+        for(int i = 0; i < species.length; i++) this.setConcentration(species[i], concentrations[i]);
     }
     @ Override
     public boolean equals(Object comparator) {

@@ -41,15 +41,15 @@ public abstract class AbstractReactor {
         this.reaction = reaction.clone();
     }
     @Override
-    // Note that global variable outlet flow should not be checked, since it might be dependent on time
     public boolean equals(Object comparator) {
+        // Note that global variable outlet flow should not be checked, since it might be dependent on time in equivalent reactors
         if(comparator == null) return false;
         if(comparator.getClass() != this.getClass()) return false;
         return this.inlet.equals(((AbstractReactor) comparator).inlet) && this.reaction.equals(((AbstractReactor) comparator).reaction);
     }
     abstract public AbstractReactor clone();
     // Running reactor for given amount of time (will end if steady state is achieved)
-    public abstract void run(int timeStep, int runTime);
+    public abstract void run(int timeStep, int runTime) throws NumericalException;
     // Running reactor till steady state is achieved
     public abstract void run(int timeStep);
     protected abstract void initializeOutletFlow() throws NumericalException;
