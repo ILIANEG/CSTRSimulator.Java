@@ -38,6 +38,7 @@ public abstract class AbstractReaction {
             this.productsStoichiometry[i] = productsStoichiometry[i];
         }
 
+
     }
     public AbstractReaction(AbstractReaction source) throws NullPointerException {
         if(source == null) throw new NullPointerException("Source object in copy constructor of Reaction is null");

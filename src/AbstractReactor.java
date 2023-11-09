@@ -13,6 +13,8 @@ public abstract class AbstractReactor {
         if(reaction == null) throw new NullPointerException("Reaction was found to be null while initializing Reactor");
         this.inlet = inlet.clone();
         this.reaction = reaction.clone();
+        ChemicalSpecies[] reactantSpecies = this.reaction.getReactants();
+        ChemicalSpecies[] productSpecies = this.reaction.getProducts();
         this.initializeOutletFlow();
     }
     public AbstractReactor(AbstractReactor source) throws NullPointerException {
@@ -49,8 +51,22 @@ public abstract class AbstractReactor {
     }
     abstract public AbstractReactor clone();
     // Running reactor for given amount of time (will end if steady state is achieved)
-    public abstract void run(int timeStep, int runTime) throws NumericalException;
+    public abstract void run(double timeStep, double runTime) throws NumericalException;
     // Running reactor till steady state is achieved
-    public abstract void run(int timeStep);
-    protected abstract void initializeOutletFlow() throws NumericalException;
+    public abstract void run(double timeStep);
+    protected void initializeOutletFlow() throws NumericalException {
+        this.g_Outlet = new Flow(this.inlet.getVolumetricFlowrate());
+        ChemicalSpecies[] inlet = this.inlet.getMixture().getSpecies();
+        ChemicalSpecies[] reactants = this.getReaction().getReactants();
+        ChemicalSpecies[] products = this.getReaction().getProducts();
+        for(int i = 0; i < inlet.length; i++) {
+            g_Outlet.mixture.addSpecies(inlet[i], 0);
+        }
+        for(int i = 0; i < reactants.length; i++) {
+            g_Outlet.mixture.addSpecies(reactants[i], 0);
+        }
+        for(int i = 0; i < products.length; i++) {
+            g_Outlet.mixture.addSpecies(products[i], 0);
+        }
+    };
 }

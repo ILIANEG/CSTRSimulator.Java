@@ -1,6 +1,7 @@
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.InvalidNotationException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_ODESolver.Function;
 
 public class SmallTests {
     public static void main(String[] argv) throws NumericalException, InvalidNotationException, ArrayException {
@@ -10,7 +11,9 @@ public class SmallTests {
         ElementaryConstantKReaction reaction = new ElementaryConstantKReaction(new ChemicalSpecies[]{a}, new ChemicalSpecies[]{b},
                 new double[]{-1}, new double[]{1}, 0.2);
         IsothermalUncontrolledTransientCSTR cstr = new IsothermalUncontrolledTransientCSTR(inlet, reaction, 1);
-        cstr.run(1, 1000);
+        Function f = cstr.generateDifferentialEquation(a);
+        System.out.println(cstr.g_Outlet);
+        cstr.run(1, 100);
         System.out.println(cstr);
     }
 }

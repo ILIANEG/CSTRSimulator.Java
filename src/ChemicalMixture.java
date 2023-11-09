@@ -99,7 +99,7 @@ public class ChemicalMixture {
      */
     public double getConcentration(ChemicalSpecies species) {
         // Null does not need to be checked, is specie is null, 0 will be returned
-        if(this.containsSpecie(species)) return this.concentrations[this.getSpeciesIndex(species)];
+        if(this.containsSpecies(species)) return this.concentrations[this.getSpeciesIndex(species)];
         return 0;
     }
 
@@ -112,7 +112,7 @@ public class ChemicalMixture {
     public void setConcentration(ChemicalSpecies species, double  concentration) throws NumericalException, NullPointerException {
         if(concentration < 0) throw new NumericalException("Attempting to assign negative concentration to a species in ChemicalMixture object");
         // Null does not need to be checked, is specie is null, 0 will be returned
-        if(this.containsSpecie(species)) this.concentrations[this.getSpeciesIndex(species)] = concentration;
+        if(this.containsSpecies(species)) this.concentrations[this.getSpeciesIndex(species)] = concentration;
         else this.addNewSpecies(species, concentration);
     }
 
@@ -120,18 +120,18 @@ public class ChemicalMixture {
      *
      * @param species Specie which concentration being altered.
      * @param concentration New concentration to be set for a specie.
-     * @throws NumericalException If amy concentration is negative
+     * @throws NumericalException If any concentration is negative
      * @throws NullPointerException
      */
-    public void addSpecie(ChemicalSpecies species, double  concentration) throws NumericalException {
-        this.setConcentration(species, concentration);
+    public void addSpecies(ChemicalSpecies species, double  concentration) throws NumericalException {
+        if(!this.containsSpecies(species)) this.setConcentration(species, concentration);
     }
     /**
      * Method that removes specie from the mixture.
      * @param species ChemicalSpecies object.
      */
     public void removeSpecies(ChemicalSpecies species) {
-        if(this.containsSpecie(species)) {
+        if(this.containsSpecies(species)) {
             int index = this.getSpeciesIndex(species);
             ChemicalSpecies[] tmpSpecies = new ChemicalSpecies[this.species.length - 1];
             double[] tmpConcentration = new double[this.concentrations.length - 1];
@@ -151,7 +151,7 @@ public class ChemicalMixture {
      * @param specie ChemicalSpecie object
      * @return Whether specie is announced in the mixture.
      */
-    public boolean containsSpecie(ChemicalSpecies specie) {
+    public boolean containsSpecies(ChemicalSpecies specie) {
         if(this.getSpeciesIndex(specie) == -1) return false;
         return true;
     }
