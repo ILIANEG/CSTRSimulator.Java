@@ -3,7 +3,7 @@ import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 /**
  * Implements Abstract Reaction to represent elementary, irreversible reaction with constant k (k is not calculated based on
- * temperature, but instead is passed as a constant into the constructor). Applicable for isothermal processes.
+ * temperature, but instead is passed as a constant into the constructor). Applicable for isothermal processes ONLY.
  */
 public class ElementaryConstantKReaction extends AbstractReaction {
     // TODO: Add descriptions, check methods
