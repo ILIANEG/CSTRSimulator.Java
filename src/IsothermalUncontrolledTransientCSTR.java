@@ -31,41 +31,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * Runs CSTR till steady state, witch step of 0.0001 time unit and e = 0.000001
      */
     @Override
-    public void run() throws NumericalException {
-        /*double currentTime = 0;
-        double e = 0;
-        do {
-            ChemicalSpecies[] tmpSpecies = new ChemicalSpecies[outlet.mixture.getNumberOfSpecies()];
-            double[] tmpConcentrations = new double[outlet.mixture.getNumberOfSpecies()];
-            for (int i = 0; i < super.outlet.mixture.getNumberOfSpecies(); i++) {
-                tmpSpecies[i] = super.outlet.mixture.getSpecies()[i];
-                tmpConcentrations[i] = this.odeEngine.step(0.0001, currentTime,
-                        super.outlet.mixture.getConcentration(tmpSpecies[i]), this.generateDifferentialEquation(tmpSpecies[i]));
-            }
-
-            for (int i = 0; i < tmpSpecies.length; i++) {
-                if(this.outlet)
-                this.outlet.mixture.setConcentration(tmpSpecies[i], tmpConcentrations[i]);
-            }
-        } while (e < 0.000001);*/
-    }
-    /*public void run(double timeStep, double runTime) throws NumericalException {
-        double currentTime = 0;
-        while(currentTime < runTime) {
-            ChemicalMixture tmpChemicalMixture = super.outlet.mixture.clone();
-            ChemicalSpecies[] tmpSpecies = new ChemicalSpecies[outlet.mixture.getNumberOfSpecies()];
-            double[] tmpConcentrations = new double[outlet.mixture.getNumberOfSpecies()];
-            for(int i = 0; i < tmpChemicalMixture.getNumberOfSpecies(); i++) {
-                tmpSpecies[i] = super.outlet.mixture.getSpecies()[i];
-                tmpConcentrations[i] = this.odeEngine.step(timeStep, currentTime,
-                        super.outlet.mixture.getConcentration(tmpSpecies[i]), this.generateDifferentialEquation(tmpSpecies[i], tmpChemicalMixture));
-            }
-            for(int i = 0; i < tmpSpecies.length; i++) {
-                this.outlet.mixture.setConcentration(tmpSpecies[i], tmpConcentrations[i]);
-            }
-            currentTime += timeStep;
-        }
-    }*/
+    public void run() throws NumericalException {}
     public void run(double timeStep, double runTime) throws NumericalException, ArrayException {
         this.odeEngine.setDefaultStepSize(1);
         this.odeEngine.reset();
@@ -96,10 +62,5 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         AbstractReaction r = this.getReaction().clone();
         return ((time, concentrations) -> this.inlet.getVolumetricFlowrate() / this.volume * (this.inlet.mixture.getConcentration(species) - concentrations[specieIndex])
                 + r.getStoichiometry(species) * r.generateRateExpression(mixture).evaluate(concentrations));
-
-        /*
-                super.inlet.getVolumetricFlowrate() / this.volume *
-                        (super.inlet.mixture.getConcentration(species) - y)
-        + super.getReaction().getStoichiometry(species)*super.getReaction().generateSingleSpecieRateExpression(species, mixture).evaluate(y);*/
     }
 }
