@@ -1,29 +1,47 @@
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
+/**
+ * Class represents and abstract reactor
+ */
 public abstract class AbstractReactor {
     /* Flows announced as protected since Flow objects might be accessed by reference to change the operating conditions.
     * Inlet flow might be accessed by reference in control loop for example.
     * g_Outlet is a global variable which certainly will be manipulated during runtime. */
     protected Flow inlet;
-    protected Flow g_Outlet;
+    protected Flow outlet;
     private AbstractReaction reaction;
-    //Constructor for irreversible reaction
-    public AbstractReactor(Flow inlet, AbstractReaction reaction) throws NullPointerException, NumericalException {
+
+    /**
+     *
+     * @param inlet Flow object representing inlet flow.
+     * @param reaction Reaction object representing the reaction occurring in the reactor.
+     * @throws NullPointerException If inlet flow or reaction objects are null.
+     */
+    public AbstractReactor(Flow inlet, Flow outlet, AbstractReaction reaction) throws NullPointerException {
+        // Null checks for inlet and reaction
         if(inlet == null) throw new NullPointerException("Inlet was found to be null while initializing Reactor");
         if(reaction == null) throw new NullPointerException("Reaction was found to be null while initializing Reactor");
+        // deep copying inlet and reaction
         this.inlet = inlet.clone();
         this.reaction = reaction.clone();
-        ChemicalSpecies[] reactantSpecies = this.reaction.getReactants();
-        ChemicalSpecies[] productSpecies = this.reaction.getProducts();
-        this.initializeOutletFlow();
+        this.outlet = this.formatOutletFlow(outlet.clone());
     }
-    public AbstractReactor(AbstractReactor source) throws NullPointerException {
+    public AbstractReactor(AbstractReactor source) throws NullPointerException{
+        // Null check
         if(source == null) throw new NullPointerException("Source object in reactor copy constructor is null");
         this.inlet = source.inlet.clone();
         this.reaction = source.reaction.clone();
-        if(this.g_Outlet == null) this.g_Outlet = null;
-        else this.g_Outlet = source.g_Outlet.clone();
+        this.outlet = source.outlet;
     }
+
+    /**
+     * Abstract clone method.
+     * @return Instance of Reactor implementation.
+     */
+    abstract public AbstractReactor clone();
+
+    /* Accessors and Mutators */
+
     public Flow getInlet() {
         return this.inlet.clone();
     }
@@ -31,9 +49,12 @@ public abstract class AbstractReactor {
         if(inlet == null) throw new NullPointerException("Attempting to set null inlet flow in Reactor object");
         this.inlet = inlet.clone();
     }
-    public Flow getG_Outlet() {
-        if(this.g_Outlet == null) return null;
-        return this.g_Outlet.clone();
+    public Flow getOutlet() {
+        return this.outlet.clone();
+    }
+    public void setOutlet(Flow outlet) throws NullPointerException {
+        if(outlet == null) throw new NullPointerException("Attempting to set null inlet flow in Reactor object");
+        this.outlet = this.formatOutletFlow(outlet.clone());
     }
     public AbstractReaction getReaction() {
         return this.reaction.clone();
@@ -45,28 +66,31 @@ public abstract class AbstractReactor {
     @Override
     public boolean equals(Object comparator) {
         // Note that global variable outlet flow should not be checked, since it might be dependent on time in equivalent reactors
-        if(comparator == null) return false;
-        if(comparator.getClass() != this.getClass()) return false;
-        return this.inlet.equals(((AbstractReactor) comparator).inlet) && this.reaction.equals(((AbstractReactor) comparator).reaction);
+        if(comparator == null || comparator.getClass() != this.getClass()) return false;
+        // Outlet is not checked since is a global variable of state, rather than a property or condition of the reactor.
+        return this.inlet.equals(((AbstractReactor) comparator).inlet) && this.reaction.equals(((AbstractReactor) comparator).reaction)
+                && this.outlet.equals(((AbstractReactor) comparator).outlet);
     }
-    abstract public AbstractReactor clone();
-    // Running reactor for given amount of time (will end if steady state is achieved)
-    public abstract void run(double timeStep, double runTime) throws NumericalException;
     // Running reactor till steady state is achieved
-    public abstract void run(double timeStep);
-    protected void initializeOutletFlow() throws NumericalException {
-        this.g_Outlet = new Flow(this.inlet.getVolumetricFlowrate());
+    public abstract void run() throws NumericalException;
+    protected Flow formatOutletFlow(Flow outlet) {
         ChemicalSpecies[] inlet = this.inlet.getMixture().getSpecies();
         ChemicalSpecies[] reactants = this.getReaction().getReactants();
         ChemicalSpecies[] products = this.getReaction().getProducts();
-        for(int i = 0; i < inlet.length; i++) {
-            g_Outlet.mixture.addSpecies(inlet[i], 0);
+        // Add all species from inlet, reactants and products, with concentration 0 if they are not already in the g_Outlet;
+        try {
+            for (int i = 0; i < inlet.length; i++) {
+                outlet.mixture.addSpecies(inlet[i], 0);
+            }
+            for (int i = 0; i < reactants.length; i++) {
+                outlet.mixture.addSpecies(reactants[i], 0);
+            }
+            for (int i = 0; i < products.length; i++) {
+                outlet.mixture.addSpecies(products[i], 0);
+            }
+        } catch (NumericalException e) {
+            /* Exception won't be thrown since 0 is a valid value for concentration */
         }
-        for(int i = 0; i < reactants.length; i++) {
-            g_Outlet.mixture.addSpecies(reactants[i], 0);
-        }
-        for(int i = 0; i < products.length; i++) {
-            g_Outlet.mixture.addSpecies(products[i], 0);
-        }
-    };
+        return outlet;
+    }
 }
