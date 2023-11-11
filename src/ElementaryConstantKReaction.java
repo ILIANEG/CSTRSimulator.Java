@@ -1,4 +1,5 @@
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
+import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 /**
@@ -39,10 +40,42 @@ public class ElementaryConstantKReaction extends AbstractReaction {
         if(mixture == null) return 0;
         ChemicalSpecies[] reactants = super.getReactants();
         double[] reactantsStoichiometry = super.getReactantsStoichiometry();
-        double reactionRate = this.calculateRateConstant(mixture);
+        double reactionRate = this.rateConstant;
         for(int i = 0; i < reactants.length; i++) {
             reactionRate *= Math.pow(mixture.getConcentration(reactants[i]), Math.abs(reactantsStoichiometry[i]));
         }
         return reactionRate;
+    }
+    /*public Function generateSingleSpecieRateExpression(ChemicalSpecies species, ChemicalMixture mixture) {
+        if(this.getStoichiometry(species) != 0) {
+            if(this.isReactant(species)) {
+                if(Math.pow(mixture.getConcentration(species), Math.abs(this.getStoichiometry(species))) == 0) {
+                    return x -> this.calculateReactionRate(mixture) * Math.pow(x, Math.abs(this.getStoichiometry(species)));
+                } else return x -> this.calculateReactionRate(mixture) /
+                        Math.pow(mixture.getConcentration(species), Math.abs(this.getStoichiometry(species)))
+                        * Math.pow(x, Math.abs(this.getStoichiometry(species)));
+
+            }
+            else return x -> this.calculateReactionRate(mixture);
+        } else return (x -> 0);
+    }*/
+    public Function generateRateExpression(ChemicalMixture mixture) {
+        ChemicalSpecies[] tmpSpecies = mixture.getSpecies();
+        final double rateConstant = this.rateConstant;
+        return (concentrations -> {
+            double r = rateConstant;
+            String tmpString = "";
+            for(int i = 0; i < tmpSpecies.length; i++) {
+                if(this.getStoichiometry(tmpSpecies[i]) == 0 || !this.isReactant(tmpSpecies[i])) {
+                    tmpString += r + " * " + "1";
+                    r *= 1;
+                }
+                else {
+                    tmpString += r + " * " + concentrations[i] + "^" + Math.abs(this.getStoichiometry(tmpSpecies[i]));
+                    r *= Math.pow(concentrations[i], Math.abs(this.getStoichiometry(tmpSpecies[i])));
+                }
+            }
+            return r;
+        });
     }
 }

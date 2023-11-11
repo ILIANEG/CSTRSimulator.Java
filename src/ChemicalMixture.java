@@ -229,7 +229,7 @@ public class ChemicalMixture {
      * @param species ChemicalSpecie object.
      * @return Index of a specie in the array, or -1 if specie is not in the array.
      */
-    private int getSpeciesIndex(ChemicalSpecies species) {
+    public int getSpeciesIndex(ChemicalSpecies species) {
         for(int i = 0; i < this.species.length; i++) {
             if(this.species[i].equals(species)) return i;
         }

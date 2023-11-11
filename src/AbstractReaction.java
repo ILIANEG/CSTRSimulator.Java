@@ -96,9 +96,15 @@ public abstract class AbstractReaction {
         }
         return 0;
     }
+    public boolean isReactant(ChemicalSpecies species) {
+        for(int i = 0; i < this.reactants.length; i++) {
+            if(this.reactants[i].equals(species)) return true;
+        }
+        return false;
+    }
     public abstract double calculateRateConstant(ChemicalMixture mixture);
     public abstract double calculateReactionRate(ChemicalMixture mixture);
-
+    public abstract Function generateRateExpression(ChemicalMixture mixture);
     /**
      * Custom validator
      */

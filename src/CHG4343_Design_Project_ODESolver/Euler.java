@@ -1,9 +1,9 @@
 package CHG4343_Design_Project_ODESolver;
-public class Euler implements ODEStepper
+public class Euler implements ODEStepperDepreciated
 {
-	public double step(double hStart, double xStart, double yStart, Function dydx)
+	public double step(double hStart, double xStart, double yStart, XYFunction dydx)
 	{
-		return dydx.evaluate(xStart,yStart)*hStart+yStart;
+		return 0;
 	}
 }
 		
