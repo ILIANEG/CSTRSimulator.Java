@@ -4,10 +4,11 @@ import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 public class ChemicalSpecies {
    private double molarMass; // molar mass in kg/mol
    private String name;
+
    /**
     * ChemicalSpecies object constructor.
     * @param name Name of chemical species.
-    * @param molarMass Molar mass of species (0 is unknown)
+    * @param molarMass Molar mass of species (if 0 then molar mass is unknown)
     * @throws InvalidNotationException If specie name is invalid (null or empty).
     * @throws NumericalException if molar mass is negative.
     */

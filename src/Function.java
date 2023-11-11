@@ -1,3 +1,3 @@
 public interface Function {
-    public double evaluate(double[] x);
+    double evaluate(double[] x);
 }

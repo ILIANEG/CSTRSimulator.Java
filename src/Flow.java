@@ -52,11 +52,6 @@ public class Flow implements Controllable {
     public ChemicalMixture getMixture() {
         return this.mixture.clone();
     }
-    /*public boolean setMixture(ChemicalMixture mixture) throws NullPointerException {
-        if(mixture == null) throw new NullPointerException("Object Mixture is null.");
-        this.mixture = mixture.clone();
-        return true;
-    }*/
     public double getVolumetricFlowrate() {
         return this.volumetricFlowrate;
     }

@@ -33,10 +33,9 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
     @Override
     public void run() throws NumericalException {}
     public void run(double timeStep, double runTime) throws NumericalException, ArrayException {
-        this.odeEngine.setDefaultStepSize(1);
+        this.odeEngine.setDefaultStepSize(timeStep);
         this.odeEngine.reset();
         double currentTime = 0;
-        System.out.println(this.outlet);
         while(currentTime < runTime) {
             Flow tmpFlow = this.outlet.clone();
             ChemicalSpecies[] tmpSpecies = tmpFlow.mixture.getSpecies();
@@ -50,17 +49,17 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
             for(int i = 0; i < tmpSpecies.length; i++) {
                 this.outlet.mixture.setConcentration(tmpSpecies[i], speciesConcentrations[i]);
             }
-            currentTime += 1;
+            currentTime += timeStep;
         }
     }
     @Override
     public String toString() {
         return "Inlet: " + this.inlet.toString() + "\n" + "Outlet: " + this.outlet.toString() + "\n" + "V: " + this.volume;
     }
-    public XYFunction generateDifferentialEquation(ChemicalSpecies species, ChemicalMixture mixture) {
-        int specieIndex = mixture.getSpeciesIndex(species);
+    public XYFunction generateDifferentialEquation(ChemicalSpecies species, ChemicalMixture outlet) {
+        int specieIndex = outlet.getSpeciesIndex(species);
         AbstractReaction r = this.getReaction().clone();
         return ((time, concentrations) -> this.inlet.getVolumetricFlowrate() / this.volume * (this.inlet.mixture.getConcentration(species) - concentrations[specieIndex])
-                + r.getStoichiometry(species) * r.generateRateExpression(mixture).evaluate(concentrations));
+                + r.getStoichiometry(species) * r.generateRateExpression(outlet).evaluate(concentrations));
     }
 }

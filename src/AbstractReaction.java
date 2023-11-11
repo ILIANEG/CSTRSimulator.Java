@@ -12,7 +12,6 @@ public abstract class AbstractReaction {
     private final ChemicalSpecies[] products;
     private final double[] reactantsStoichiometry; // Stored as negative values
     private final double[] productsStoichiometry; // Stored as positive values
-
     /**
      *
      * @param reactants Array of ChemicalSpecies representing reactants.
@@ -37,8 +36,6 @@ public abstract class AbstractReaction {
             this.products[i] = products[i].clone();
             this.productsStoichiometry[i] = productsStoichiometry[i];
         }
-
-
     }
     public AbstractReaction(AbstractReaction source) throws NullPointerException {
         if(source == null) throw new NullPointerException("Source object in copy constructor of Reaction is null");
@@ -87,13 +84,22 @@ public abstract class AbstractReaction {
         }
         return tmpProductsStoichiometry;
     }
+
+    /**
+     * Method returns a stoichiometry of species X in the system.
+     * @param species ChemicalSpecies object.
+     * @return stoichiometric ratio of species (0 if inert).
+     */
     public double getStoichiometry(ChemicalSpecies species) {
+        // Check if species is a reactant and return stoichiometry if it is.
         for(int i = 0; i < this.products.length; i++) {
             if(this.products[i].equals(species)) return this.productsStoichiometry[i];
         }
+        // Check if species is a product and return stoichiometry if it is.
         for(int i = 0; i < this.reactants.length; i++) {
             if(this.reactants[i].equals(species)) return this.reactantsStoichiometry[i];
         }
+        // return for inert species;
         return 0;
     }
     public boolean isReactant(ChemicalSpecies species) {
