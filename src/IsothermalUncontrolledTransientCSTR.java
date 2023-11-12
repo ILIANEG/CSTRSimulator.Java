@@ -11,7 +11,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         if(volume < 0) throw new NumericalException("Negative volume is not allowed");
         this.volume = volume;
         this.odeEngine = new RK45();
-        this.odeEngine.setDefaultStepSize(1);
+        this.odeEngine.setInitialStepSize(1);
         this.odeEngine.reset();
     }
     public IsothermalUncontrolledTransientCSTR(IsothermalUncontrolledTransientCSTR source) throws NumericalException {
@@ -33,7 +33,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
     @Override
     public void run() throws NumericalException {}
     public void run(double timeStep, double runTime) throws NumericalException, ArrayException {
-        this.odeEngine.setDefaultStepSize(timeStep);
+        this.odeEngine.setInitialStepSize(timeStep);
         this.odeEngine.reset();
         double currentTime = 0;
         while(currentTime < runTime) {

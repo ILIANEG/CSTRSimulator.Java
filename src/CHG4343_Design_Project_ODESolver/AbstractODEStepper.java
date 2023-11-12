@@ -1,16 +1,15 @@
 package CHG4343_Design_Project_ODESolver;
 
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
-import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 public abstract class AbstractODEStepper {
-    private double defaultStepSize;
+    private double initialStepSize;
     private double g_stepSize;
     private double g_epsilon;
     public AbstractODEStepper(double defaultStepSize) throws NumericalException {
         if(0 <= defaultStepSize) throw new NumericalException("Invalid step size in ODEStepper Object.");
-        this.defaultStepSize = defaultStepSize;
+        this.initialStepSize = defaultStepSize;
         this.reset();
     }
 
@@ -18,10 +17,10 @@ public abstract class AbstractODEStepper {
      * Constructor with default step size = 0.00001
      */
     public AbstractODEStepper() {
-        this.defaultStepSize = 0.00001;
+        this.initialStepSize = 0.00001;
     }
     public AbstractODEStepper(AbstractODEStepper source) {
-        this.defaultStepSize = source.defaultStepSize;
+        this.initialStepSize = source.initialStepSize;
         this.reset();
 
     }
@@ -29,12 +28,12 @@ public abstract class AbstractODEStepper {
 
     /* Accessors & Mutators */
 
-    public double getDefaultStepSize() {
-        return defaultStepSize;
+    public double getInitialStepSize() {
+        return initialStepSize;
     }
-    public void setDefaultStepSize(double stepSize) throws NumericalException {
+    public void setInitialStepSize(double stepSize) throws NumericalException {
         if(stepSize <= 0) throw new NumericalException("Invalid step size in ODEStepper Object.");
-        this.defaultStepSize = stepSize;
+        this.initialStepSize = stepSize;
     }
     public double getStepSize() {
         return this.g_stepSize;
@@ -48,7 +47,7 @@ public abstract class AbstractODEStepper {
      */
     public void reset() {
         this.g_epsilon = Double.POSITIVE_INFINITY;
-        this.g_stepSize = this.defaultStepSize;
+        this.g_stepSize = this.initialStepSize;
     }
 
     /**
