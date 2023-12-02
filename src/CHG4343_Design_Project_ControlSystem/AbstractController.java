@@ -1,8 +1,26 @@
 package CHG4343_Design_Project_ControlSystem;
 
+import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+
 public abstract class AbstractController {
     private double setPoint;
     private double deadTime;
+
+    public AbstractController(double setPoint, double deadTime) throws NumericalException
+    {
+        if(deadTime < 0) throw new NumericalException("Dead Time is less than zero");
+        if(setPoint < 0) throw new NumericalException("Set Point is less than zero");
+        this.setPoint = setPoint;
+        this.deadTime = deadTime;
+    }
+
+    public AbstractController(AbstractController source) throws IllegalArgumentException
+    {
+        if(source == null) throw new IllegalArgumentException("Source object in reactor copy constructor is null");
+        this.setPoint = source.setPoint;
+        this.deadTime = source.deadTime;
+    }
+
     public abstract AbstractController clone();
 
     public double e(double value) {
