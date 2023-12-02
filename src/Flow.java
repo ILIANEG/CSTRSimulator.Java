@@ -1,7 +1,7 @@
 import CHG4343_Design_Project_ControlSystem.Controllable;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
-public class Flow implements Controllable {
+public class Flow {
     /* Announced final to have access to the reference of the mixture object in a safe and controlled way.
     * This approach allows to modify mixture object through ChemicalMixture methods, using the reference rather than deep copy.
     * It will be immutable and other classes won't be able to reassign this field to null (null safety) or another Mixture object (invalid state safety)
@@ -71,23 +71,6 @@ public class Flow implements Controllable {
      */
     public double calculateMolarFlowrate(ChemicalSpecies species) {
         return mixture.calculateMolesSolute(species, this.volumetricFlowrate);
-    }
-    /**
-     * adjustControllableParameter implementation in Flow object. Allows to control flow rate.
-     * @param value Value to be assigned to the flow rate.
-     * @throws NumericalException If value is negative number.
-     */
-    @Override
-    public void adjustControllableParameter(double value) throws NumericalException {
-        this.setVolumetricFlowrate(value);
-    }
-    /**
-     * getControllableParameter implementation in Flow object.
-     * @return Volumetric flow rate, units: m^3/s.
-     */
-    @Override
-    public double getControllableParameter() {
-        return this.volumetricFlowrate;
     }
     @Override
     public String toString() {
