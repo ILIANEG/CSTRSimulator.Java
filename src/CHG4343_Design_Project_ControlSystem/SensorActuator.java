@@ -7,6 +7,9 @@ import java.util.Queue;
 public class SensorActuator {
     private AbstractController controller;
     private Controllable controlledObject;
+    private SignalQueue processAdjustments;
+    private SignalQueue disturbances;
+    private SignalQueue setPointChanges;
     private int controlID;
     public SensorActuator(Controllable controlledObject, AbstractController controller, int controlID) throws IllegalArgumentException {
         if(controlledObject == null) throw new IllegalArgumentException("Controlled object is null while initializing sensor/actuator");
@@ -14,6 +17,15 @@ public class SensorActuator {
         this.controlledObject = controlledObject;
         this.controller = controller.clone();
         this.controlID = controlID;
+        this.processAdjustments = new SignalQueue();
+    }
+    public SensorActuator(Controllable controlledObject, AbstractController controller, int controlID, SignalQueue disturbances) {
+        if(controlledObject == null) throw new IllegalArgumentException("Controlled object is null while initializing sensor/actuator");
+        if(controller == null) throw new IllegalArgumentException("Controller is null while initializing sensor/actuator");
+        this.controlledObject = controlledObject;
+        this.controller = controller.clone();
+        this.controlID = controlID;
+        this.processAdjustments = new SignalQueue();
     }
 
     public SensorActuator(SensorActuator source) throws IllegalArgumentException
