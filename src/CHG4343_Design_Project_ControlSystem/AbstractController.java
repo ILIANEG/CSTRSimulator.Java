@@ -27,7 +27,7 @@ public abstract class AbstractController {
         return setPoint = value;
     }
     public abstract void tune(double k, double tau, double theta);
-    public abstract double controlSignal(double value);
+    public abstract double calculateControlSignal(double t, double value);
     public void setSetPoint(double setPoint) throws NumericalException
     {
         if (setPoint<0) throw new NumericalException("Attempted to set SetPoint to a negative value.");

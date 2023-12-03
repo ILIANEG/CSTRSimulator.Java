@@ -7,7 +7,7 @@ public class SignalQueue {
     public SignalQueue(SignalQueue source) {
         this.signals = new Signal[source.signals.length];
         for(int i = 0; i < this.signals.length; i++) {
-            this.signals[i] = source.signals[i];
+            this.signals[i] = source.signals[i].clone();
         }
     }
     public SignalQueue clone() {
@@ -57,5 +57,14 @@ public class SignalQueue {
     public double checkLastTime() {
         if(this.isEmpty()) return -1;
         return this.signals[0].getTime();
+    }
+    public boolean equals(Object comparator) {
+        if(comparator == null || comparator.getClass() != this.getClass()) return false;
+        SignalQueue signalQ = (SignalQueue) comparator;
+        if(this.signals.length != signalQ.signals.length) return false;
+        for(int i = 0; i < this.signals.length; i++) {
+            if(this.signals[i] != signalQ.signals[i]) return false;
+        }
+        return true;
     }
 }

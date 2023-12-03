@@ -36,7 +36,7 @@ public class IsothermalVolumetricFlowControlCSTR extends IsothermalUncontrolledT
 
     @Override
     public void adjustControllableParameter(double value, int id) throws NumericalException {
-        switch (id) {
+        switch(id) {
             case 0 :
                 super.inlet.setVolumetricFlowrate(value);
                 super.outlet.setVolumetricFlowrate(value);
@@ -44,7 +44,11 @@ public class IsothermalVolumetricFlowControlCSTR extends IsothermalUncontrolledT
     }
 
     @Override
-    public double getControllableParameter() {
+    public double getControllableParameter(int id) {
+        switch(id) {
+            case 0:
+                super.inlet.getVolumetricFlowrate();
+        }
         return super.inlet.getVolumetricFlowrate();
     }
 }
