@@ -31,11 +31,10 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * Runs CSTR till steady state, witch step of 0.0001 time unit and e = 0.000001
      */
     @Override
-    public void run() throws NumericalException {}
-    public void run(double timeStep, double runTime) throws NumericalException, ArrayException {
-        this.odeEngine.setInitialStepSize(timeStep);
-        this.odeEngine.reset();
-        double currentTime = 0;
+    public void run(double h, double initialTime, double runTime, AbstractODEStepper odeEngine) throws NumericalException, ArrayException {
+        odeEngine.setInitialStepSize(h);
+        odeEngine.reset();
+        double currentTime = initialTime;
         while(currentTime < runTime) {
             Flow tmpFlow = this.outlet.clone();
             ChemicalSpecies[] tmpSpecies = tmpFlow.mixture.getSpecies();
@@ -45,11 +44,11 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
                 speciesFunction[i] = this.generateDifferentialEquation(tmpSpecies[i], tmpFlow.mixture);
                 speciesConcentrations[i] = tmpFlow.mixture.getConcentration(tmpSpecies[i]);
             }
-            speciesConcentrations = this.odeEngine.step(currentTime, speciesConcentrations, speciesFunction);
+            speciesConcentrations = odeEngine.step(currentTime, speciesConcentrations, speciesFunction);
             for(int i = 0; i < tmpSpecies.length; i++) {
                 this.outlet.mixture.setConcentration(tmpSpecies[i], speciesConcentrations[i]);
             }
-            currentTime += timeStep;
+            currentTime += h;
         }
     }
     @Override

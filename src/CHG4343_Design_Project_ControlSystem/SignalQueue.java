@@ -29,7 +29,7 @@ public class SignalQueue {
         this.signals = tmpSignals;
         return true;
     }
-    public Signal get() {
+    public Signal pop() {
         if(this.isEmpty()) return null;
         Signal[] tmpSignals = new Signal[this.signals.length - 1];
         for(int i = 1; i < this.signals.length; i++) {
@@ -45,7 +45,7 @@ public class SignalQueue {
         while(!sorted) {
             sorted = true;
             for(int i = 0; i < this.signals.length-1; i++) {
-                if(signals[i].getTime() < signals[i+1].getTime()) {
+                if(signals[i].time < signals[i+1].time) {
                     sorted = false;
                     Signal tmpSignal = signals[i];
                     signals[i+1] = signals[i];
@@ -54,9 +54,9 @@ public class SignalQueue {
             }
         }
     }
-    public double checkLastTime() {
-        if(this.isEmpty()) return -1;
-        return this.signals[0].getTime();
+    public Signal peek() {
+        if(this.isEmpty()) return null;
+        return this.signals[0];
     }
     public boolean equals(Object comparator) {
         if(comparator == null || comparator.getClass() != this.getClass()) return false;

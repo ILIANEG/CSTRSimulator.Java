@@ -2,35 +2,42 @@ import CHG4343_Design_Project_ControlSystem.AbstractController;
 import CHG4343_Design_Project_ControlSystem.Controllable;
 import CHG4343_Design_Project_ControlSystem.SensorActuator;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_ODESolver.AbstractODEStepper;
 
 public class IsothermalVolumetricFlowControlCSTR extends IsothermalUncontrolledTransientCSTR implements Controllable {
-    private SensorActuator controls;
-    public IsothermalVolumetricFlowControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, AbstractController controller) throws NumericalException {
+    private SensorActuator actuator;
+    public IsothermalVolumetricFlowControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, SensorActuator actuator) throws NumericalException {
         super(inlet, outlet, reaction, volume);
-        this.controls = new SensorActuator(this, controller, 0);
+        this.actuator = actuator.clone();
+
     }
 
     public IsothermalVolumetricFlowControlCSTR(IsothermalVolumetricFlowControlCSTR source) throws NumericalException
     {
         super(source);
-        this.controls = source.controls.clone();
+        this.actuator = source.actuator.clone();
     }
-    public void setControls(AbstractController controller) throws IllegalArgumentException
+    public void setControls(SensorActuator actuator) throws IllegalArgumentException
     {
-        if(controller==null) throw new IllegalArgumentException("Attempted to pass a null value to controller");
-        this.controls = new SensorActuator(this, controller, 0);
+        if(actuator==null) throw new IllegalArgumentException("Attempted to pass a null actuator to reactor object");
+        this.actuator = actuator.clone();
     }
 
     public SensorActuator getControls()
     {
-        return this.controls;
+        return this.actuator;
+    }
+
+    @Override
+    public void run(double h, double initialTime, double runTime, AbstractODEStepper odeEngine) throws NumericalException {
+
     }
 
     public boolean equals(Object comparator)
     {
         if(!super.equals(comparator)) return false;
         IsothermalVolumetricFlowControlCSTR obj = ((IsothermalVolumetricFlowControlCSTR)comparator);
-        if(!obj.controls.equals(this.controls)) return false;
+        if(!obj.actuator.equals(this.actuator)) return false;
         return true;
     }
 

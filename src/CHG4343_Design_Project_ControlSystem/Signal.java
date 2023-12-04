@@ -21,16 +21,6 @@ public class Signal {
         return new Signal(this);
     }
 
-    public double getTime()
-    {
-        return this.time;
-    }
-
-    public double getValue()
-    {
-        return this.value;
-    }
-
     public boolean equals(Object comparator)
     {
         if(comparator == null || comparator.getClass() != this.getClass()) return false;

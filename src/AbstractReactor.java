@@ -1,4 +1,6 @@
+import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_ODESolver.AbstractODEStepper;
 
 /**
  * Class represents and abstract reactor
@@ -72,7 +74,7 @@ public abstract class AbstractReactor {
                 && this.outlet.equals(((AbstractReactor) comparator).outlet);
     }
     // Running reactor till steady state is achieved
-    public abstract void run() throws NumericalException;
+    public abstract void run(double h, double xStart, double xFinish, AbstractODEStepper odeStepper) throws NumericalException, ArrayException;
     protected Flow formatOutletFlow(Flow outlet) {
         ChemicalSpecies[] inlet = this.inlet.getMixture().getSpecies();
         ChemicalSpecies[] reactants = this.getReaction().getReactants();
