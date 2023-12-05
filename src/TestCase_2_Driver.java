@@ -20,6 +20,6 @@ public class TestCase_2_Driver {
         IsothermalSpecieConcentrationControlCSTR cstr = new IsothermalSpecieConcentrationControlCSTR(inlet, outlet, reaction, 1, sensor, a);
         cstr.run(0.01, 100, new RK45());
         System.out.println(cstr);
-        cstr.getRuntimeData().writeToFile("/home/nilliax/Documents/testCase2.csv");
+        cstr.getRuntimeData().writeToFile("C:\\Users\\Illia\\Documents\\CHG4343_Design_Project_G09\\data.csv");
     }
 }
