@@ -6,10 +6,12 @@ public class SensorActuator {
     private AbstractController controller;
     private SignalQueue processAdjustments;
     private Signal g_lastProcessedSignal;
+    private double g_lastTimePolled;
     private SignalQueue setPointChanges;
     private double deadTime;
+    private double pollingTime;
     private int id;
-    public SensorActuator(AbstractController controller, double deadTime, int id) throws IllegalArgumentException, NumericalException {
+    public SensorActuator(AbstractController controller, double deadTime, double pollingTime, int id) throws NumericalException {
         if(controller == null) throw new IllegalArgumentException("Controller is null while initializing sensor/actuator");
         if(deadTime < 0) throw new NumericalException("Dead Time is less than zero");
         if(id < 0) throw new IllegalArgumentException("Actuator ID must be an integer between 0 and inf, while " + id + " was passed");
@@ -17,10 +19,11 @@ public class SensorActuator {
         this.processAdjustments = new SignalQueue();
         this.setPointChanges = new SignalQueue();
         this.deadTime = deadTime;
+        this.pollingTime = pollingTime;
         this.id = id;
         this.reset();
     }
-    public SensorActuator(AbstractController controller, double deadTime, int id, SignalQueue disturbances, SignalQueue setPointChanges) throws NumericalException {
+    public SensorActuator(AbstractController controller, double deadTime, double pollingTime, int id, SignalQueue setPointChanges) throws NumericalException {
         if(controller == null) throw new IllegalArgumentException("Controller is null while initializing sensor/actuator");
         if(deadTime < 0) throw new NumericalException("Dead Time is less than zero");
         if(id < 0) throw new IllegalArgumentException("Actuator ID must be an integer between 0 and inf, while " + id + " was passed");
@@ -29,6 +32,7 @@ public class SensorActuator {
         if(setPointChanges == null) this.setPointChanges = new SignalQueue();
         else setPointChanges.clone();
         this.deadTime = deadTime;
+        this.pollingTime = pollingTime;
         this.id = id;
         this.reset();
     }
@@ -36,8 +40,10 @@ public class SensorActuator {
     {
         if(source == null) throw new IllegalArgumentException("Source object in reactor copy constructor is null");
         this.controller = source.controller.clone();
+        this.processAdjustments = source.processAdjustments.clone();
         this.setPointChanges = source.setPointChanges.clone();
         this.deadTime = source.deadTime;
+        this.pollingTime = source.pollingTime;
         this.id = source.id;
         this.reset();
     }
@@ -48,6 +54,7 @@ public class SensorActuator {
     }
     public void reset() {
         this.g_lastProcessedSignal = null;
+        this.g_lastTimePolled = -1;
     }
     public void setController(AbstractController controller) throws IllegalArgumentException
     {
@@ -83,20 +90,26 @@ public class SensorActuator {
         return this.deadTime;
     }
     public void trigger(double time, Controllable controlledObject) throws NumericalException {
-        if(!this.setPointChanges.isEmpty() && time <= this.setPointChanges.peek().time) {
+        if(!this.setPointChanges.isEmpty() && this.setPointChanges.peek().time <= time) {
             this.controller.setSetPoint(this.setPointChanges.pop().value);
         }
-        double value = this.controller.calculateControlSignal(time, controlledObject.getControllableParameter(this.id));
-        Signal currSignal = new Signal(time, value);
-        if(g_lastProcessedSignal == null) {
-            controlledObject.adjustControllableParameter(value, this.id);
-            g_lastProcessedSignal = currSignal;
-        } else if (this.deadTime <= time - g_lastProcessedSignal.time) {
+        if(!this.processAdjustments.isEmpty() && this.deadTime <= time - this.processAdjustments.peek().time) {
             Signal qSignal = this.processAdjustments.pop();
             controlledObject.adjustControllableParameter(qSignal.value, this.id);
-            this.processAdjustments.add(currSignal);
-            g_lastProcessedSignal = qSignal;
-        } else this.processAdjustments.add(currSignal);
+            this.g_lastProcessedSignal = qSignal;
+        }
+        if(this.g_lastTimePolled == -1 || pollingTime <= time - g_lastTimePolled) {
+            if(this.g_lastProcessedSignal == null || this.deadTime <= time - g_lastProcessedSignal.time) {
+                Signal signal = new Signal(time,
+                        this.controller.calculateControlSignal(time, controlledObject.getControllableParameter(this.id)));
+                controlledObject.adjustControllableParameter(signal.value, this.id);
+                this.g_lastProcessedSignal = signal;
+            } else {
+                Signal signal = new Signal(time,
+                        this.controller.calculateControlSignal(time, controlledObject.getControllableParameter(this.id)));
+                this.processAdjustments.add(signal);
+            }
+        }
     }
     public boolean equals(Object comparator)
     {

@@ -7,9 +7,9 @@ public abstract class AbstractODEStepper {
     private double initialStepSize;
     private double g_stepSize;
     private double g_epsilon;
-    public AbstractODEStepper(double defaultStepSize) throws NumericalException {
-        if(0 <= defaultStepSize) throw new NumericalException("Invalid step size in ODEStepper Object.");
-        this.initialStepSize = defaultStepSize;
+    public AbstractODEStepper(double initialStepSize) throws NumericalException {
+        if(initialStepSize <= 0) throw new NumericalException("Invalid step size in ODEStepper Object.");
+        this.initialStepSize = initialStepSize;
         this.reset();
     }
 
@@ -17,7 +17,7 @@ public abstract class AbstractODEStepper {
      * Constructor with default step size = 0.00001
      */
     public AbstractODEStepper() {
-        this.initialStepSize = 0.00001;
+        this.initialStepSize = 0.01;
     }
     public AbstractODEStepper(AbstractODEStepper source) {
         this.initialStepSize = source.initialStepSize;
@@ -34,6 +34,10 @@ public abstract class AbstractODEStepper {
     public void setInitialStepSize(double stepSize) throws NumericalException {
         if(stepSize <= 0) throw new NumericalException("Invalid step size in ODEStepper Object.");
         this.initialStepSize = stepSize;
+    }
+    public void setStepSize(double stepSize) throws NumericalException {
+        if(stepSize <= 0) throw new NumericalException("Invalid step size in ODEStepper Object.");
+        this.g_stepSize = stepSize;
     }
     public double getStepSize() {
         return this.g_stepSize;

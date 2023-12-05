@@ -1,19 +1,19 @@
 import CHG4343_Design_Project_ControlSystem.AbstractController;
 import CHG4343_Design_Project_ControlSystem.Controllable;
 import CHG4343_Design_Project_ControlSystem.SensorActuator;
+import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 import CHG4343_Design_Project_ODESolver.AbstractODEStepper;
 
 public class IsothermalVolumetricFlowControlCSTR extends IsothermalUncontrolledTransientCSTR implements Controllable {
     private SensorActuator actuator;
-    public IsothermalVolumetricFlowControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, SensorActuator actuator) throws NumericalException {
+    public IsothermalVolumetricFlowControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, SensorActuator actuator) throws NumericalException, ArrayException {
         super(inlet, outlet, reaction, volume);
         this.actuator = actuator.clone();
 
     }
 
-    public IsothermalVolumetricFlowControlCSTR(IsothermalVolumetricFlowControlCSTR source) throws NumericalException
-    {
+    public IsothermalVolumetricFlowControlCSTR(IsothermalVolumetricFlowControlCSTR source) throws NumericalException, ArrayException {
         super(source);
         this.actuator = source.actuator.clone();
     }
@@ -29,8 +29,13 @@ public class IsothermalVolumetricFlowControlCSTR extends IsothermalUncontrolledT
     }
 
     @Override
-    public void run(double h, double initialTime, double runTime, AbstractODEStepper odeEngine) throws NumericalException {
-
+    public void run(double h, double finalTime, AbstractODEStepper odeEngine) throws NumericalException, ArrayException {
+        double t = 0;
+        while (t < finalTime) {
+            super.integrate(t, t+h, odeEngine);
+            t = t + h;
+            this.actuator.trigger(t, this);
+        }
     }
 
     public boolean equals(Object comparator)

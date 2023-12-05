@@ -15,7 +15,7 @@ public class TestDriver {
         Flow inlet = new Flow(new ChemicalMixture(new ChemicalSpecies[]{a}, new double[]{0.2}), 0.05);
         Flow outlet = new Flow(0.05);
         IsothermalUncontrolledTransientCSTR cstr = new IsothermalUncontrolledTransientCSTR(inlet, outlet, reaction, 1);
-        cstr.run(0.001, 0, 1000, new RK45());
+        cstr.run(0.01, 1000, new RK45());
         System.out.println(cstr);
     }
 }

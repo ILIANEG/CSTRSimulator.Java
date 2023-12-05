@@ -1,41 +1,44 @@
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_DataStorage.NumericalDataStorageDepricated;
 import CHG4343_Design_Project_ODESolver.*;
 
 public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
     private double volume;
-    private AbstractODEStepper odeEngine;
+    private NumericalDataStorageDepricated g_runData;
 
-    public IsothermalUncontrolledTransientCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume) throws NullPointerException, NumericalException {
+    public IsothermalUncontrolledTransientCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume) throws NullPointerException, NumericalException, ArrayException {
         super(inlet, outlet, reaction);
         if(volume < 0) throw new NumericalException("Negative volume is not allowed");
         this.volume = volume;
-        this.odeEngine = new RK45();
-        this.odeEngine.setInitialStepSize(1);
-        this.odeEngine.reset();
+        this.reset();
     }
-    public IsothermalUncontrolledTransientCSTR(IsothermalUncontrolledTransientCSTR source) throws NumericalException {
+    public IsothermalUncontrolledTransientCSTR(IsothermalUncontrolledTransientCSTR source) throws NumericalException, ArrayException {
         super(source.inlet, source.outlet, source.getReaction());
-        this.odeEngine = source.odeEngine;
         this.volume = source.volume;
+        this.reset();
     }
     @Override
     public AbstractReactor clone() {
         try {
             return new IsothermalUncontrolledTransientCSTR(this);
-        } catch (NumericalException e) {
+        } catch (NumericalException | ArrayException e) {
             throw new RuntimeException(e);
         }
+    }
+    public void reset() throws ArrayException {
+        this.g_runData = new NumericalDataStorageDepricated(this.generateHeaders());
+    }
+    public NumericalDataStorageDepricated getRuntimeData() {
+        return this.g_runData;
     }
     /**
      * Runs CSTR till steady state, witch step of 0.0001 time unit and e = 0.000001
      */
     @Override
-    public void run(double h, double initialTime, double runTime, AbstractODEStepper odeEngine) throws NumericalException, ArrayException {
-        odeEngine.setInitialStepSize(h);
-        odeEngine.reset();
-        double currentTime = initialTime;
-        while(currentTime < runTime) {
+    protected void integrate(double xStart, double xFinish, AbstractODEStepper odeEngine) throws NumericalException, ArrayException {
+        double currentTime = xStart;
+        while(currentTime < xFinish) {
             Flow tmpFlow = this.outlet.clone();
             ChemicalSpecies[] tmpSpecies = tmpFlow.mixture.getSpecies();
             XYFunction[] speciesFunction = new XYFunction[tmpFlow.mixture.getNumberOfSpecies()];
@@ -48,7 +51,19 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
             for(int i = 0; i < tmpSpecies.length; i++) {
                 this.outlet.mixture.setConcentration(tmpSpecies[i], speciesConcentrations[i]);
             }
+            currentTime += odeEngine.getStepSize();
+        }
+    }
+    @Override
+    public void run(double h, double finalTime, AbstractODEStepper odeEngine) throws NumericalException, ArrayException {
+        odeEngine.reset();
+        odeEngine.setStepSize(h);
+        double currentTime = 0;
+        //g_runData.addDataRow(formatDataRow(currentTime, this.outlet.mixture.getConcentrations()));
+        while(currentTime < finalTime) {
+            this.integrate(currentTime, currentTime+h, odeEngine);
             currentTime += h;
+            //g_runData.addDataRow(formatDataRow(currentTime, this.outlet.mixture.getConcentrations()));
         }
     }
     @Override
@@ -60,5 +75,22 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         AbstractReaction r = this.getReaction().clone();
         return ((time, concentrations) -> this.inlet.getVolumetricFlowrate() / this.volume * (this.inlet.mixture.getConcentration(species) - concentrations[specieIndex])
                 + r.getStoichiometry(species) * r.generateRateExpression(outlet).evaluate(concentrations));
+    }
+    private String[] generateHeaders() {
+        ChemicalSpecies[] species = this.outlet.mixture.getSpecies();
+        String[] headers = new String[species.length + 1];
+        headers[0] = "t";
+        for(int i = 0; i < species.length; i++) {
+            headers[i+1] = species[i].getName();
+        }
+        return headers;
+    }
+    private double[] formatDataRow(double time, double[] concentrations) {
+        double[] formattedData = new double[concentrations.length + 1];
+        formattedData[0] = time;
+        for(int i = 0; i < concentrations.length; i++) {
+            formattedData[i+1] = concentrations[i];
+        }
+        return formattedData;
     }
 }
