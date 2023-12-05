@@ -1,11 +1,11 @@
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
-import CHG4343_Design_Project_DataStorage.NumericalDataStorageDepricated;
+import CHG4343_Design_Project_DataStorage.NumericalDataStorage;
 import CHG4343_Design_Project_ODESolver.*;
 
 public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
     private double volume;
-    private NumericalDataStorageDepricated g_runData;
+    protected NumericalDataStorage g_runData;
 
     public IsothermalUncontrolledTransientCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume) throws NullPointerException, NumericalException, ArrayException {
         super(inlet, outlet, reaction);
@@ -27,9 +27,9 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         }
     }
     public void reset() throws ArrayException {
-        this.g_runData = new NumericalDataStorageDepricated(this.generateHeaders());
+        this.g_runData = new NumericalDataStorage(this.generateHeaders());
     }
-    public NumericalDataStorageDepricated getRuntimeData() {
+    public NumericalDataStorage getRuntimeData() {
         return this.g_runData;
     }
     /**
@@ -59,11 +59,11 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         odeEngine.reset();
         odeEngine.setStepSize(h);
         double currentTime = 0;
-        //g_runData.addDataRow(formatDataRow(currentTime, this.outlet.mixture.getConcentrations()));
+        g_runData.addDataRow(formatDataRow(currentTime, this.outlet.mixture.getConcentrations()));
         while(currentTime < finalTime) {
             this.integrate(currentTime, currentTime+h, odeEngine);
             currentTime += h;
-            //g_runData.addDataRow(formatDataRow(currentTime, this.outlet.mixture.getConcentrations()));
+            g_runData.addDataRow(formatDataRow(currentTime, this.outlet.mixture.getConcentrations()));
         }
     }
     @Override
@@ -76,7 +76,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         return ((time, concentrations) -> this.inlet.getVolumetricFlowrate() / this.volume * (this.inlet.mixture.getConcentration(species) - concentrations[specieIndex])
                 + r.getStoichiometry(species) * r.generateRateExpression(outlet).evaluate(concentrations));
     }
-    private String[] generateHeaders() {
+    protected String[] generateHeaders() {
         ChemicalSpecies[] species = this.outlet.mixture.getSpecies();
         String[] headers = new String[species.length + 1];
         headers[0] = "t";
@@ -85,7 +85,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         }
         return headers;
     }
-    private double[] formatDataRow(double time, double[] concentrations) {
+    protected double[] formatDataRow(double time, double[] concentrations) {
         double[] formattedData = new double[concentrations.length + 1];
         formattedData[0] = time;
         for(int i = 0; i < concentrations.length; i++) {

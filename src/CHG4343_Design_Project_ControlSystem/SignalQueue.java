@@ -33,7 +33,7 @@ public class SignalQueue {
         if(this.isEmpty()) return null;
         Signal[] tmpSignals = new Signal[this.signals.length - 1];
         for(int i = 1; i < this.signals.length; i++) {
-            tmpSignals[i] = this.signals[i];
+            tmpSignals[i-1] = this.signals[i];
         }
         Signal retSignal = this.signals[0];
         this.signals = tmpSignals;
