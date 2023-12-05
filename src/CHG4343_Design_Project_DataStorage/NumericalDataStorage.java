@@ -63,12 +63,12 @@ public class NumericalDataStorage {
         StringBuilder s = new StringBuilder();
         for(int i = 0; i < this.headers.length; i++) {
             if(i != this.headers.length - 1) s.append(this.headers[i]).append(",");
-            else s.append(this.headers[i]).append(";").append("\n");
+            else s.append(this.headers[i]).append("\n");
         }
         for (String[] row : this.numericalData) {
             for (int i = 0; i < row.length; i++) {
                 if (i != row.length - 1) s.append(row[i]).append(",");
-                else s.append(row[i]).append(";").append("\n");
+                else s.append(row[i]).append("\n");
             }
         }
         fr.write(s.toString());

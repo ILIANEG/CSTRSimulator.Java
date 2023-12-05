@@ -20,7 +20,7 @@ public abstract class AbstractController {
     public abstract AbstractController clone();
 
     public double e(double value) {
-        return setPoint = value;
+        return setPoint - value;
     }
     public abstract void tune(double k, double tau, double theta);
     public abstract double calculateControlSignal(double t, double value);

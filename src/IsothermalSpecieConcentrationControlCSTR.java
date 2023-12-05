@@ -39,6 +39,7 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
         while (t < finalTime) {
             super.integrate(t, t+h, odeEngine);
             t += h;
+            System.out.println(this.outlet);
             this.actuator.trigger(t, this);
             super.g_runData.addDataRow(formatDataRow(t, this.outlet.mixture.getConcentrations()));
         }
