@@ -1,4 +1,3 @@
-import CHG4343_Design_Project_CustomExcpetions.InvalidNotationException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
 /**
@@ -14,10 +13,8 @@ public class ChemicalSpecies {
     * ChemicalSpecies object constructor.
     * @param name Name of chemical species.
     * @param molarMass Molar mass of species in appropriate units (if 0 then molar mass is unknown)
-    * @throws InvalidNotationException If specie name is invalid (null or empty).
-    * @throws NumericalException if molar mass is negative.
     */
-   public ChemicalSpecies(String name, double molarMass) throws IllegalArgumentException{
+   public ChemicalSpecies(String name, double molarMass) {
       // Check if name is valid
       if(name == null || name.isEmpty()) {
          throw new IllegalArgumentException("Name of chemical specie must be specified.");
@@ -52,19 +49,16 @@ public class ChemicalSpecies {
 
    /**
     * Molar mass accessor.
-    * @return molar mass
+    * @return molar mass.
     */
    public double getMolarMass() { return this.molarMass; }
 
    /**
     * Molar mass mutator.
-    * @param molarMass molar mass in appropriate units
-    * @throws NumericalException
+    * @param molarMass molar mass in appropriate units.
     */
-   public void setMolarMass(double molarMass) throws NumericalException {
-      if(molarMass < 0) {
-         throw new NumericalException("Invalid molar mass value. Molar mass must not be negative.");
-      }
+   public void setMolarMass(double molarMass) {
+      if(molarMass < 0) throw new NumericalException("Attempting to assign negative molar mass to ChemicalSpecies object");
       this.molarMass = molarMass;
    }
 
@@ -77,13 +71,11 @@ public class ChemicalSpecies {
    /**
     * Name mutator.
     * @param name name of chemical species.
-    * @throws InvalidNotationException if notation is invalid.
     */
-   public void setName(String name) {
-      if(name == null || name.isEmpty()) {
-         throw new InvalidNotationException("Name of chemical specie must be specified.");
-      }
+   public boolean setName(String name) {
+      if(name == null || name.isEmpty()) throw new IllegalArgumentException("Attempting to assign invalid name to ChemicalSpecies object");
       this.name = name;
+      return true;
    }
 
    /**
