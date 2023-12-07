@@ -3,13 +3,13 @@ package CHG4343_Design_Project_ODESolver;
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
-public abstract class AbstractODEStepper {
+public abstract class AbstractODESolver {
     private double dx0;
     private double tolerance;
     protected int maxIterations;
     protected double g_dx;
     protected double g_epsilon;
-    public AbstractODEStepper(double dx0, double tolerance, int maxIterations) throws NumericalException {
+    public AbstractODESolver(double dx0, double tolerance, int maxIterations) throws NumericalException {
         if(dx0 <= 0) throw new NumericalException("Invalid initial step size in ODEStepper Object.");
         if(tolerance <= 0) throw new NumericalException("Tolerance can not be 0 or negative number");
         this.tolerance = tolerance;
@@ -21,20 +21,20 @@ public abstract class AbstractODEStepper {
     /**
      * Constructor with default step size = 0.00001
      */
-    public AbstractODEStepper() {
+    public AbstractODESolver() {
         this.dx0 = 0.01;
         this.tolerance = 1E-10;
         this.maxIterations = 1000000;
         reset();
     }
-    public AbstractODEStepper(AbstractODEStepper source) {
+    public AbstractODESolver(AbstractODESolver source) {
         this.dx0 = source.dx0;
         this.tolerance = source.tolerance;
         this.maxIterations = source.maxIterations;
         this.reset();
 
     }
-    public abstract AbstractODEStepper clone();
+    public abstract AbstractODESolver clone();
 
     /* Accessors & Mutators */
 
@@ -74,7 +74,7 @@ public abstract class AbstractODEStepper {
         this.g_epsilon = Double.POSITIVE_INFINITY;
         this.g_dx = this.dx0;
     }
-    public double[] converge(double x0, double[] y, XYFunction[] dydx) {
+    public double[] solve(double x0, double[] y, XYFunction[] dydx) {
         double[] yi = y;
         double x = x0;
         int iterator = 0;

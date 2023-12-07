@@ -19,10 +19,10 @@ public class TestCase_2_Driver {
         SensorActuator sensor = new SensorActuator(new PIController(0.04, 0.64, 4, 0.2), 0.2, 0, 0);
         RK45 rk45 = new RK45(0.001, 1E-10, 1000000);
         IsothermalSpecieConcentrationControlCSTR cstr = new IsothermalSpecieConcentrationControlCSTR(inlet, outlet, reaction, 1, rk45, sensor, a);
-        cstr.run(0.1, 300);
+        cstr.runForNTime(0.1, 300);
         System.out.println(cstr);
         cstr.performStepChange(1.2, 0);
-        cstr.run(0.1, 1000);
+        cstr.runForNTime(0.1, 1000);
         System.out.println(cstr);
         cstr.getRuntimeData().writeToFile("/home/nilliax/Documents/testCase2.csv");
     }

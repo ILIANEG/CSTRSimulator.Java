@@ -40,12 +40,18 @@ public abstract class AbstractReaction {
             this.productsStoichiometry[i] = productsStoichiometry[i];
         }
     }
-    public AbstractReaction(AbstractReaction source) throws NullPointerException {
-        if(source == null) throw new NullPointerException("Source object in copy constructor of Reaction is null");
+
+    /**
+     * Abstract reaction copy constructor
+     * @param source Abstract Rector source object
+     */
+    public AbstractReaction(AbstractReaction source) {
+        if(source == null) throw new IllegalArgumentException("Source object in copy constructor of Reaction is null");
         this.reactants = new ChemicalSpecies[source.reactants.length];
         this.products = new ChemicalSpecies[source.products.length];
         this.reactantsStoichiometry = new double[source.reactantsStoichiometry.length];
         this.productsStoichiometry = new double[source.productsStoichiometry.length];
+        // Deep copying arrays
         for(int i = 0; i < this.reactants.length; i++) {
             this.reactants[i] = source.reactants[i].clone();
             this.reactantsStoichiometry[i] = source.reactantsStoichiometry[i];
@@ -55,33 +61,56 @@ public abstract class AbstractReaction {
             this.productsStoichiometry[i] = source.productsStoichiometry[i];
         }
     }
+    // Abstract clone method
     abstract public AbstractReaction clone();
 
     /* Accessor and Mutators */
 
+    /**
+     * @return array of reactant species.
+     */
     public ChemicalSpecies[] getReactants() {
         ChemicalSpecies[] tmpReactants = new ChemicalSpecies[this.reactants.length];
+        // deep copy the array of species
         for(int i = 0; i < this.reactants.length; i++) {
             tmpReactants[i] = this.reactants[i].clone();
         }
         return tmpReactants;
     }
+
+    /**
+     *
+     * @return array of product species.
+     */
     public ChemicalSpecies[] getProducts() {
         ChemicalSpecies[] tmpProducts = new ChemicalSpecies[this.products.length];
+        // deep copying the array of species
         for(int i = 0; i < this.products.length; i++) {
             tmpProducts[i] = this.products[i].clone();
         }
         return tmpProducts;
     }
+
+    /**
+     *
+     * @return array of reactant stoichiometries.
+     */
     public double[] getReactantsStoichiometry() {
         double[] tmpReactantsStoichiometry = new double[this.reactantsStoichiometry.length];
+        // Deep copying the array
         for(int i = 0; i < this.reactantsStoichiometry.length; i++) {
             tmpReactantsStoichiometry[i] = this.reactantsStoichiometry[i];
         }
         return tmpReactantsStoichiometry;
     }
+
+    /**
+     *
+     * @return array of product stoichiometries.
+     */
     public double[] getProductsStoichiometry() {
         double[] tmpProductsStoichiometry = new double[this.reactantsStoichiometry.length];
+        // Deep copying the array
         for(int i = 0; i < this.productsStoichiometry.length; i++) {
             tmpProductsStoichiometry[i] = this.productsStoichiometry[i];
         }
@@ -111,11 +140,34 @@ public abstract class AbstractReaction {
         }
         return false;
     }
-    public abstract double calculateRateConstant(ChemicalMixture mixture);
-    public abstract double calculateReactionRate(ChemicalMixture mixture);
-    public abstract Function generateRateExpression(ChemicalMixture mixture);
+
     /**
-     * Custom validator
+     * Method calculated the rate constant of the reaction
+     * @param mixture ChemicalMixture object
+     * @return rate constant of the reaction
+     */
+    public abstract double calculateRateConstant(ChemicalMixture mixture);
+
+    /**
+     * Method calculates the rate of the reaction.
+     * @param mixture ChemicalMixture object
+     * @return rate of the reaction.
+     */
+    public abstract double calculateReactionRate(ChemicalMixture mixture);
+
+    /**
+     * Generate rate expression as a lambda function.
+     * @param mixture ChemicalMixture object.
+     * @return lambda function (following Function interface)
+     */
+    public abstract Function generateRateExpression(ChemicalMixture mixture);
+
+    /**
+     * Custom data validator.
+     * @param reactants array of reactants species.
+     * @param products array of product species.
+     * @param reactantsStoichiometry array of reactant stoichiometries.
+     * @param productsStoichiometry array of product stoichiomnetries.
      */
     private static void validateData(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactantsStoichiometry,
                                      double[] productsStoichiometry) {

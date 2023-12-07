@@ -2,12 +2,12 @@ import CHG4343_Design_Project_ControlSystem.Controllable;
 import CHG4343_Design_Project_ControlSystem.SensorActuator;
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
-import CHG4343_Design_Project_ODESolver.AbstractODEStepper;
+import CHG4343_Design_Project_ODESolver.AbstractODESolver;
 
 public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontrolledTransientCSTR implements Controllable {
     private SensorActuator actuator;
     private ChemicalSpecies controlledSpecies;
-    public IsothermalSpecieConcentrationControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, AbstractODEStepper odeEngine,
+    public IsothermalSpecieConcentrationControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, AbstractODESolver odeEngine,
                                                     SensorActuator actuator, ChemicalSpecies controlledSpecies){
         super(inlet, outlet, reaction, volume, odeEngine);
         this.controlledSpecies = controlledSpecies.clone();
@@ -30,8 +30,8 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
         return this.actuator;
     }
 
-    @Override
-    public void run(double dt, double runTime) {
+    //@Override
+    public void runForNTime(double dt, double runTime) {
         //this.g_odeEngine.reset();
         while(this.g_currentTime < runTime) {
             this.g_runData.addDataRow(formatDataRow(this.g_currentTime, this.outlet.mixture.getConcentrations()));
