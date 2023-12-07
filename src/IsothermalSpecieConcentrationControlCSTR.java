@@ -7,13 +7,13 @@ import CHG4343_Design_Project_ODESolver.AbstractODEStepper;
 public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontrolledTransientCSTR implements Controllable {
     private SensorActuator actuator;
     private ChemicalSpecies controlledSpecies;
-    public IsothermalSpecieConcentrationControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, SensorActuator actuator, ChemicalSpecies controlledSpecies) throws NumericalException, ArrayException {
-        super(inlet, outlet, reaction, volume);
+    public IsothermalSpecieConcentrationControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, AbstractODEStepper odeEngine,
+                                                    SensorActuator actuator, ChemicalSpecies controlledSpecies){
+        super(inlet, outlet, reaction, volume, odeEngine);
         this.controlledSpecies = controlledSpecies.clone();
         this.actuator = actuator.clone();
 
     }
-
     public IsothermalSpecieConcentrationControlCSTR(IsothermalSpecieConcentrationControlCSTR source) throws NumericalException, ArrayException {
         super(source);
         this.controlledSpecies = source.controlledSpecies;
@@ -31,20 +31,17 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
     }
 
     @Override
-    public void run(double h, double finalTime, AbstractODEStepper odeEngine) throws NumericalException, ArrayException {
-        double t = 0;
-        odeEngine.reset();
-        odeEngine.setStepSize(0.01);
-        super.g_runData.addDataRow(formatDataRow(t, this.outlet.mixture.getConcentrations()));
-        while (t < finalTime) {
-            super.integrate(t, t+h, odeEngine);
-            t += h;
-            System.out.println(this.outlet);
-            this.actuator.trigger(t, this);
-            super.g_runData.addDataRow(formatDataRow(t, this.outlet.mixture.getConcentrations()));
+    public void run(double dt, double runTime) {
+        //this.g_odeEngine.reset();
+        while(this.g_currentTime < runTime) {
+            this.g_runData.addDataRow(formatDataRow(this.g_currentTime, this.outlet.mixture.getConcentrations()));
+            this.outlet.mixture.setConcentrations(
+                    this.g_odeEngine.integrate(this.g_currentTime, this.g_currentTime+dt, this.outlet.mixture.getConcentrations(),
+                            this.generateDifferentialEquations()));
+            this.actuator.trigger(this.g_currentTime, this);
+            this.g_currentTime += dt;
         }
     }
-
     public boolean equals(Object comparator)
     {
         if(!super.equals(comparator)) return false;
@@ -54,9 +51,10 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
     }
 
     @Override
-    public void adjustControllableParameter(double value, int id) throws NumericalException {
+    public void adjustControllableParameter(double value, int id) {
         switch(id) {
             case 0 :
+                if(value < 0) value = 0;
                 super.inlet.setVolumetricFlowrate(value);
                 super.outlet.setVolumetricFlowrate(value);
         }
@@ -69,5 +67,12 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
                 return super.outlet.mixture.getConcentration(this.controlledSpecies);
         }
         return 0;
+    }
+    @Override
+    public void performStepChange(double value, int id) {
+        switch(id) {
+            case 0:
+                super.inlet.mixture.setConcentration(this.controlledSpecies, value);
+        }
     }
 }

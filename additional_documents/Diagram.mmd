@@ -1,0 +1,37 @@
+---
+title: CHG4343 Project
+---
+classDiagram
+    ChemicalMixture o-- ChemicalSpecies
+      class ChemicalSpecies{
+          -double molarMass
+          -String name
+          +clone() ChemicalSpecies
+          +getMolarMass() double
+          +setMolarMass(double molarMass)
+          +getName() String
+          +setName(String name)
+          +equals(Object comparator)
+          +toString() String
+      }
+      class ChemicalMixture{
+          -ChemicalMixture[] species
+          -double[] concentration
+          -double temperature
+          +clone() ChemicalMixture
+          +getSpecies() ChemicalSpecies[]
+          +getConcentrations() double[]
+          +getTemperature() double
+          +setTemperature(double temperature)
+          +getNumberOfSpecies() int
+          +containsSpecies(ChemicalSpecies species) boolean
+          +getSpeciesIndex(ChemicalSpecies species) int
+          +getConcentration(ChemicalSpecies species) double
+          +setConcentration(ChemicalSpecies species, double concentration)
+          +addSpecies(ChemicalSpecies species, double concentration)
+          +removeSpecies(ChemicalSpecies species)
+          +addMultipleSpecies(ChemicalSpecies[] species, double[] concentrations)
+          +equals(Object comparator) boolean
+          +toString() String
+          -addNewSpecies(ChemicalSpecies species, double concentration)
+      }

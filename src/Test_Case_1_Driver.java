@@ -3,6 +3,7 @@ import CHG4343_Design_Project_ControlSystem.SensorActuator;
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.InvalidNotationException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_ODESolver.AbstractODEStepper;
 import CHG4343_Design_Project_ODESolver.RK45;
 
 import java.io.IOException;
@@ -16,8 +17,9 @@ public class Test_Case_1_Driver {
                 new double[]{-1}, new double[]{1}, 0.2);
         Flow inlet = new Flow(new ChemicalMixture(new ChemicalSpecies[]{a}, new double[]{0.2}), 0.05);
         Flow outlet = new Flow(0.05);
-        IsothermalUncontrolledTransientCSTR cstr = new IsothermalUncontrolledTransientCSTR(inlet, outlet, reaction, 1);
-        cstr.run(0.01, 500, new RK45());
+        RK45 rk45 = new RK45(0.001, 1E-5, 10000000);
+        IsothermalUncontrolledTransientCSTR cstr = new IsothermalUncontrolledTransientCSTR(inlet, outlet, reaction, 1, rk45);
+        cstr.run(0.1, 300);
         System.out.println(cstr);
         cstr.getRuntimeData().writeToFile("/home/nilliax/Documents/testCase1.csv");
     }

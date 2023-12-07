@@ -73,8 +73,7 @@ public abstract class AbstractReactor {
         return this.inlet.equals(((AbstractReactor) comparator).inlet) && this.reaction.equals(((AbstractReactor) comparator).reaction)
                 && this.outlet.equals(((AbstractReactor) comparator).outlet);
     }
-    protected abstract void integrate(double xStart, double xFinish, AbstractODEStepper odeEngine) throws NumericalException, ArrayException;
-    public abstract void run(double h, double xFinish, AbstractODEStepper odeEngine) throws NumericalException, ArrayException;
+    public abstract void run(double step, double xFinish) throws NumericalException, ArrayException;
     protected Flow formatOutletFlow(Flow outlet) {
         ChemicalSpecies[] inlet = this.inlet.getMixture().getSpecies();
         ChemicalSpecies[] reactants = this.getReaction().getReactants();

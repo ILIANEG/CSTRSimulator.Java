@@ -74,6 +74,16 @@ public class ChemicalMixture {
         }
         return tempSpecies;
     }
+    public void setConcentrations(double[] concentrations) {
+        if(concentrations == null) throw new IllegalArgumentException("Concentrations being assigned can not be null");
+        if(concentrations.length != this.species.length) throw new ArrayException("Array concentrations does not match the length of array species");
+        double[] tmpConcentrations = new double[concentrations.length];
+        for(int i = 0; i < this.concentrations.length; i++) {
+            if(concentrations[i] < 0) throw new NumericalException("Concentration can not be negative");
+            tmpConcentrations[i] = concentrations[i];
+        }
+        this.concentrations = tmpConcentrations;
+    }
     public double[] getConcentrations() {
         double[] tempConcentrations = new double[this.concentrations.length];
         for(int i = 0; i < this.concentrations.length; i++) {
@@ -103,12 +113,12 @@ public class ChemicalMixture {
         return this.species.length;
     }
     /**
-     * Check if given specie is "announced" in the mixture (even if the specie has concentration = 0).
-     * @param specie ChemicalSpecie object
-     * @return Whether specie is announced in the mixture.
+     * Check if given species is "announced" in the mixture (even if the species has concentration = 0).
+     * @param species ChemicalSpecie object
+     * @return Whether species is announced in the mixture.
      */
-    public boolean containsSpecies(ChemicalSpecies specie) {
-        if(this.getSpeciesIndex(specie) == -1) return false;
+    public boolean containsSpecies(ChemicalSpecies species) {
+        if(this.getSpeciesIndex(species) == -1) return false;
         else return true;
     }
     /**
