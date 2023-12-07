@@ -145,10 +145,10 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
     }
 
     /**
-     *
-     * @param species
-     * @param outlet
-     * @return
+     * Programmatically generates differential equation for a given specie in form of a lambda function.
+     * @param species Species for which differential equation is being generated
+     * @param outlet Outlet condition
+     * @return lambda function (XYFunction interface) representing a differential equation for a given species.
      */
     public XYFunction generateDifferentialEquation(ChemicalSpecies species, ChemicalMixture outlet) {
         int specieIndex = outlet.getSpeciesIndex(species);
@@ -156,6 +156,11 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         return ((time, concentrations) -> this.inlet.getVolumetricFlowrate() / this.volume * (this.inlet.mixture.getConcentration(species) - concentrations[specieIndex])
                 + r.getStoichiometry(species) * r.generateRateExpression(outlet).evaluate(concentrations));
     }
+
+    /**
+     * Generates headers for data storage.
+     * @return String of data headers in form of [t, A, B, ..., N]
+     */
     protected String[] generateHeaders() {
         ChemicalSpecies[] species = this.outlet.mixture.getSpecies();
         String[] headers = new String[species.length + 1];
@@ -165,6 +170,13 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         }
         return headers;
     }
+
+    /**
+     * Helper function to format data row before being added to the data storage.
+     * @param time
+     * @param concentrations
+     * @return array of data to prepared for data storage
+     */
     protected double[] formatDataRow(double time, double[] concentrations) {
         double[] formattedData = new double[concentrations.length + 1];
         formattedData[0] = time;
