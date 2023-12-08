@@ -3,6 +3,10 @@ package CHG4343_Design_Project_ODESolver;
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
+/**
+ * Abstract ODE solver that solves a system of differential equations for an array of functions (implementing interface XYFunction)
+ * and double array of initial conditions.
+ */
 public abstract class AbstractODESolver {
     private double dx0;
     private double tolerance;

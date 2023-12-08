@@ -121,7 +121,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
     }
 
     /**
-     * Runs reactor for a given amount of time. Records run result every dt period of time.
+     * Runs reactor till steady state is achieved. Records run result every dt period of time.
      * @param dt time step for data recording purposes.
      */
     public void runTillSteadyState(double dt, boolean reset) {
@@ -135,7 +135,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
     }
 
     /**
-     * Method calculates outlet concentrations based on current conditions.
+     * Method calculates outlet concentrations based on current conditions. Run time data will not be recorded.
      */
     @Override
     public void calculateOutlet() {

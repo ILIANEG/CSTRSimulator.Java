@@ -8,6 +8,8 @@ import CHG4343_Design_Project_ODESolver.AbstractODESolver;
  * This class extends functionality of uncontrolled CSTR to enable a controlled run.
  * This particular implementation allows to control single specie concentration, however
  * The id system will allow to have multiple control parameters if implemented.
+ * Note: Only runForNTime() is capable of engaging control system, running till steady state
+ * won't trigger the control system.
  */
 public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontrolledTransientCSTR implements Controllable {
     private SensorActuator actuator;
@@ -117,7 +119,7 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
     /**
      * Controllable interface implementation. Adjust controlled parameter.
      * @param value new parameter value.
-     * @param id
+     * @param id controller id. Not applicable for single specie concentration control system
      */
     @Override
     public void adjustControllableParameter(double value, int id) {
@@ -126,10 +128,21 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
         super.outlet.setVolumetricFlowrate(value);
     }
 
+    /**
+     * Controllable interface implementation. Return value of controlled parameter.
+     * @param id controller id. Not applicable for single specie concentration control system
+     * @return value of controlled parameter
+     */
     @Override
     public double getControllableParameter(int id) {
         return super.outlet.mixture.getConcentration(this.controlledSpecies);
     }
+
+    /**
+     * Perform step change in the control parameter.
+     * @param value new value of control parameter.
+     * @param id controller id.
+     */
     @Override
     public void performStepChange(double value, int id) {
         super.inlet.mixture.setConcentration(this.controlledSpecies, value);
