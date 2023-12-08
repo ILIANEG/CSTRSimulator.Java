@@ -12,7 +12,7 @@ import CHG4343_Design_Project_Mathematical.XYFunction;
 public abstract class AbstractNumericalODESolver {
     private double dx0;
     private double tolerance; // local tolerance
-    private double convergance; // global tolerance
+    private double convergence; // global tolerance
     private int maxIterations;
     protected double g_dx;
     protected double g_epsilon;
@@ -22,14 +22,14 @@ public abstract class AbstractNumericalODESolver {
      *
      * @param dx0 initial step size.
      * @param tolerance tolerance (both local and global)
-     * @param convergance
+     * @param convergence
      * @param maxIterations
      */
-    public AbstractNumericalODESolver(double dx0, double tolerance, double convergance, int maxIterations) {
-        this.convergance = convergance;
+    public AbstractNumericalODESolver(double dx0, double tolerance, double convergence, int maxIterations) {
+        this.convergence = convergence;
         if(dx0 <= 0) throw new NumericalException("Default step size can not be 0 or negative number in ODE Solver.");
         if(tolerance <= 0) throw new NumericalException("Tolerance can not be 0 or negative number in ODE Solver.");
-        if(convergance <= 0) throw new NumericalException("Convergance can not be 0 or negative number in ODE Solver.");
+        if(convergence <= 0) throw new NumericalException("Convergance can not be 0 or negative number in ODE Solver.");
         if(maxIterations <= 0) throw new NumericalException("Maximum iterations can not be 0 or negative number in ODE Solver");
         this.tolerance = tolerance;
         this.dx0 = dx0;
@@ -45,7 +45,7 @@ public abstract class AbstractNumericalODESolver {
         this.dx0 = source.dx0;
         this.tolerance = source.tolerance;
         this.maxIterations = source.maxIterations;
-        this.convergance = source.convergance;
+        this.convergence = source.convergence;
         this.reset();
 
     }
@@ -89,10 +89,11 @@ public abstract class AbstractNumericalODESolver {
      * Convergence mutator.
      * @return
      */
-    public double getConvergance() { return this.convergance; }
-    public void setConvergance(double convergance) {
-        if(convergance <= 0) throw new IllegalArgumentException("Convergance value can not be negative or 0");
-        this.convergance = convergance;
+    public double getConvergence() { return this.convergence; }
+    public void setConvergence(double convergence) {
+        if(convergence <= 0) throw new IllegalArgumentException("" +
+                "Convergence value can not be negative or 0");
+        this.convergence = convergence;
     }
 
     /**
@@ -114,7 +115,7 @@ public abstract class AbstractNumericalODESolver {
      * @return
      */
     public boolean isConverged() {
-        return this.g_epsilon <= this.convergance;
+        return this.g_epsilon <= this.convergence;
     }
 
     /**
@@ -129,7 +130,7 @@ public abstract class AbstractNumericalODESolver {
         double x = x0;
         int iterator = 0;
         while(!this.isConverged()) {
-            if(this.maxIterations <= iterator) throw new ODESolverException("Maximum number of iterations reached");
+            if(this.maxIterations <= iterator) throw new ODESolverException("Maximum number of iterations reached before convergence, try to increase convergence or maximum steps number");
             yi = this.step(x, yi, dydx);
             x += this.g_dx;
             iterator++;
@@ -162,5 +163,5 @@ public abstract class AbstractNumericalODESolver {
      * @param dydx Differentiation function for current step.
      * @return new value of y.
      */
-    public abstract double[] step(double x, double[] y, XYFunction[] dydx) throws ArrayException, NumericalException;
+    public abstract double[] step(double x, double[] y, XYFunction[] dydx);
 }

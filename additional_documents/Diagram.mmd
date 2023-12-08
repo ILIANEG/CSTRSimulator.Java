@@ -2,36 +2,194 @@
 title: CHG4343 Project
 ---
 classDiagram
+    %% Relationship between concrete classes
     ChemicalMixture o-- ChemicalSpecies
-      class ChemicalSpecies{
-          -double molarMass
-          -String name
-          +clone() ChemicalSpecies
-          +getMolarMass() double
-          +setMolarMass(double molarMass)
-          +getName() String
-          +setName(String name)
-          +equals(Object comparator)
-          +toString() String
-      }
-      class ChemicalMixture{
-          -ChemicalMixture[] species
-          -double[] concentration
-          -double temperature
-          +clone() ChemicalMixture
-          +getSpecies() ChemicalSpecies[]
-          +getConcentrations() double[]
-          +getTemperature() double
-          +setTemperature(double temperature)
-          +getNumberOfSpecies() int
-          +containsSpecies(ChemicalSpecies species) boolean
-          +getSpeciesIndex(ChemicalSpecies species) int
-          +getConcentration(ChemicalSpecies species) double
-          +setConcentration(ChemicalSpecies species, double concentration)
-          +addSpecies(ChemicalSpecies species, double concentration)
-          +removeSpecies(ChemicalSpecies species)
-          +addMultipleSpecies(ChemicalSpecies[] species, double[] concentrations)
-          +equals(Object comparator) boolean
-          +toString() String
-          -addNewSpecies(ChemicalSpecies species, double concentration)
-      }
+    Flow o-- ChemicalMixture
+    AbstractReactor o-- AbstractReaction
+    IsothermalUncontrolledTransientCSTR o-- AbstractNumericalODESolver
+
+    %% IsA relationships
+    AbstractReaction <|-- ElementaryConstantKReaction
+    AbstractNumericalODESolver <|-- RK45
+    AbstractReactor <|-- IsothermalUncontrolledTransientCSTR
+
+    class ChemicalSpecies {
+        -double molarMass
+        -String name
+        +clone() ChemicalSpecies
+        +getMolarMass() double
+        +setMolarMass(double molarMass)
+        +getName() String
+        +setName(String name)
+        +equals(Object comparator)
+        +toString() String
+    }
+    class ChemicalMixture {
+        -ChemicalSpecies[] species
+        -double[] concentration
+        -double temperature
+        +clone() ChemicalMixture
+        +getSpecies() ChemicalSpecies[]
+        +setSpecies(ChemicalSpecies[] species)
+        +getConcentrations() double[]
+        +setConcentrations(double[] concentrations)
+        +getTemperature() double
+        +setTemperature(double temperature)
+        +getNumberOfSpecies() int
+        +containsSpecies(ChemicalSpecies species) boolean
+        +getSpeciesIndex(ChemicalSpecies species) int
+        +getConcentration(ChemicalSpecies species) double
+        +setConcentration(ChemicalSpecies species, double concentration)
+        +addSpecies(ChemicalSpecies species, double concentration)
+        +removeSpecies(ChemicalSpecies species)
+        +equals(Object comparator) boolean
+        +toString() String
+        -addNewSpecies(ChemicalSpecies species, double concentration)
+        -validateData(ChemicalSpecies[] species, double[] concentrations)$
+    }
+    class Flow {
+        +ChemicalMixture mixture
+        -double volumetricFlowrate
+        +clone() Flow
+        +getMixture() ChemicalMixture
+        +getVolumetricFlowrate() double
+        +setVolumetricFlowrate(double volumetricFlowrate)
+        +equals(Object comparator) boolean
+        +toString() String
+    }
+    class AbstractReaction {
+        <<Abstract>>
+        -ChemicalSpecies[] reactants
+        -ChemicalSpecies[] product
+        -double[] reactantsStoichiometry
+        -double[] productStoichiometry
+        +clone() AbstractReaction*
+        +getReactants() ChemicalSpecies[]
+        +getProducts() ChemicalSpecies[]
+        +getReactantsStoichiometry() double[]
+        +getProductsStoichiometry() double[]
+        +getStoichiometry(ChemicalSpecies species) double[]
+        +isReactant(ChemicalMixture species) boolean
+        -validateData(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactant)
+        +calculateRateConstant(ChemicalMixture mixture) double*
+        +calculateReactionRate(ChemicalMisture mixture) double*
+        +generateRateExpression(ChemicalMixture mixture) Function*
+    }
+    class ElementaryConstantKReaction {
+        +double rateConstant
+        +calculateRateCosntant(ChemicalMixture mixture)
+        +setRateConstant(double rateConstant)
+        +calculateReactionRate(ChemicalMixture mixture) double
+        +generateRateExpression(ChemicalMixture mixture) Function
+    }
+    class AbstractReactor {
+        <<Abstract>>
+        #Flow inlet
+        #Flow outlet
+        -AbstractReaction reaction
+        +getInlet() Flow
+        +setInlet(Flow inlet)
+        +getOutlet() Flow
+        +setOutlet()
+        +getReaction() AbstractReaction
+        +setReaction(AbstractReaction reaction)
+        +equals() boolean
+        +calculateOutlet() *
+        -formatOutletFlow(Flow outlet)
+    }
+    class IsothermalUncontrolledTransientCSTR {
+        -double volume
+        #double g_currentTime
+        #NumericalDataStorage g_runData
+        #AbstractNumericalODESolver g_oedEngine
+        +clone() AbstractReactor
+        +reset()
+        +getVolume() double
+        +setVolume(double volume)
+        +getOdeEngine() AbstractNumericalODESolver
+        +setOdeEngine(AbstractNumericalODESolver odeEngine)
+        +getRuntimeData() NumericalDataStorage
+        +runForNTime(double dt, double runTime, boolean reset)
+        +runTillSteadyState(double dt, boolean reset)
+        +calculateOutlet()
+        +generateDifferentialEquation(ChemicalSpecies species, ChemicalMixture outlet) XYFunction
+        +generateDifferntialEquations() XYFunctions[]
+        +toString() String
+        #generateHeaders() String[]
+        #formatDataRow(double time, double[] concentrations) double[]
+    }
+    class AbstractNumericalODESolver {
+        <<Abstract>>
+        -double dx0
+        -double tolerance
+        -double convergence
+        -double maxIterations
+        #double g_dx
+        #double g_epsilon
+        +getDx0() double
+        +setDx0(double dx0)
+        +getTolerance() double
+        +setTolerance(double tolerance)
+        +getConvergance() double
+        +setConvergance(double convergance)
+        +getMaxIterations() double
+        +setMaxIterations(int maxIterations) int
+        +reset()
+        +isConverged() boolean
+        +converge(double x0, double[] y) double[]
+        +integrate(double x0, double xf, double[] y, XYFunction[] dydx) double[]
+        +step(double x, double[] y, XYFunction[] dydx) double[]*
+        +clone() AbstractNumericalODESolver*
+    }
+    class RK45 {
+        #double[][] butcherTableauK
+        #double[][] butcherTableau4thOrder
+        #double[][] butcherTableau5thOrder
+        +step(double x, double[] y, XYFunction dydx) double[]
+        +calculateEpsilone(double[] z, double[] y) double
+        +claculateSTepSize(double[] z, double[] y) double
+    }
+    class AbstractController {
+        <<Abstract>>
+        -double setPoint
+        +setSetPoint(double setPoint)
+        +e(doble value) double
+        +equals(Object comparator) boolean
+        +calculateControlSignal(double t, double value) double*
+        +tune(k, tau, theta) *
+        +clone() *
+    }
+    class PIController {
+        -double kC
+        -double tauI
+        -double g_iPrev
+        -double g_tPrev
+    }
+
+    %% Interfaces
+    class Function {
+        <<Interface>>
+        double evaluate(double[] x)
+    }
+    class XYFunction {
+        <<Interface>>
+        double evaluate(double x, double[] y)
+    }
+    class Controllable {
+        <<interface>>
+        adjustControllableParameter(double value, int id)
+        getControllableParameter(int id) double
+        performStepChange(double value, int id)
+    }
+    class P {
+        <<interface>>
+        double calculateP(double Kc, double e)
+    }
+    class I {
+        <<interface>>
+        double calculateI(double Kc, double tauI, double e, double t, double tPrev, double iPrev)
+    }
+    class D {
+        <<Interface>>
+        double calculateD(double Kc, double t, double tPrev, double y, double yPrev)
+    }

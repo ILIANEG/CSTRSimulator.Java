@@ -1,6 +1,5 @@
 import CHG4343_Design_Project_ControlSystem.Controllable;
 import CHG4343_Design_Project_ControlSystem.ControlElement;
-import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 import CHG4343_Design_Project_ODESolver.AbstractNumericalODESolver;
 
 /**
@@ -94,11 +93,12 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
      * @param reset flag whether state should be reset before running reactor, this will not reset outlet concentrations
      */
     @Override
-    public void runForNTime(double dt, double runTime, boolean reset) throws NumericalException {
-        if (dt<=0) throw new NumericalException("dt cannot be negative or zero");
-        if (runTime<=0) throw new NumericalException("runtime cannot be negative or zero");
-        if(this.actuator.getDeadTime() < dt) throw new IllegalArgumentException("Dead time is larger then time" +
-                "interval dt, wt which control system will be triggered. Lower dt");
+    public void runForNTime(double dt, double runTime, boolean reset) {
+        if(this.actuator.getDeadTime() < dt) throw new IllegalArgumentException("Interval dt is larger then time" +
+                " control element dead time, this will introduce additional lag to the system. Lower dt. If actuator lag needs to be simulated, set " +
+                "control element polling time to required lag.");
+        if(dt <= 0) throw new IllegalArgumentException("dt can not be negative or equal to 0");
+        if(runTime < 0) throw new IllegalArgumentException("Run time can not be negative");
         if(reset) this.g_odeEngine.reset();
         double localTimeCounter = 0;
         while(localTimeCounter < runTime) {
