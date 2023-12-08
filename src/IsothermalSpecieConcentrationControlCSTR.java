@@ -1,6 +1,6 @@
 import CHG4343_Design_Project_ControlSystem.Controllable;
 import CHG4343_Design_Project_ControlSystem.ControlElement;
-import CHG4343_Design_Project_ODESolver.AbstractODESolver;
+import CHG4343_Design_Project_ODESolver.AbstractNumericalODESolver;
 
 /**
  * This class extends functionality of uncontrolled CSTR to enable a controlled run.
@@ -19,7 +19,7 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
      * @param controlledSpecies species that will be controlled.
      * @see IsothermalUncontrolledTransientCSTR for super() constructor.
      */
-    public IsothermalSpecieConcentrationControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, AbstractODESolver odeEngine,
+    public IsothermalSpecieConcentrationControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, AbstractNumericalODESolver odeEngine,
                                                     ControlElement actuator, ChemicalSpecies controlledSpecies){
         super(inlet, outlet, reaction, volume, odeEngine);
         this.controlledSpecies = controlledSpecies.clone();
@@ -94,6 +94,8 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
      */
     @Override
     public void runForNTime(double dt, double runTime, boolean reset) {
+        if(this.actuator.getDeadTime() < dt) throw new IllegalArgumentException("Dead time is larger then time" +
+                "interval dt, wt which control system will be triggered. Lower dt");
         if(reset) this.g_odeEngine.reset();
         double localTimeCounter = 0;
         while(localTimeCounter < runTime) {

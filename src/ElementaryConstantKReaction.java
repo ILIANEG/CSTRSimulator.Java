@@ -16,6 +16,7 @@ public class ElementaryConstantKReaction extends AbstractReaction {
     public ElementaryConstantKReaction(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactantsStochiometry,
                                        double[] productStochiometry, double rateConstant) throws ArrayException, NumericalException {
         super(reactants, products, reactantsStochiometry, productStochiometry);
+        if(rateConstant < 0) throw new NumericalException("Rate constant can not be negative");
         // assigning rate constant
         this.rateConstant = rateConstant;
     }

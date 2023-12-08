@@ -10,7 +10,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
     private double volume; // volume in appropriate units
     protected double g_currentTime; // global variable that tracks total reactor runtime
     protected NumericalDataStorage g_runData; // runtime data
-    protected AbstractODESolver g_odeEngine; // ode engine used to solve the system of differential equations
+    protected AbstractNumericalODESolver g_odeEngine; // ode engine used to solve the system of differential equations
 
     /**
      * Constructor for isothermal uncontrolled transient CSTR reactor.
@@ -18,7 +18,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * @param odeEngine odeEngine used to solve differential equations numerically.
      * @see AbstractReactor for super constructor.
      */
-    public IsothermalUncontrolledTransientCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, AbstractODESolver odeEngine) {
+    public IsothermalUncontrolledTransientCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, AbstractNumericalODESolver odeEngine) {
         super(inlet, outlet, reaction);
         if(volume < 0) throw new NumericalException("Negative volume is not allowed");
         if(odeEngine == null) throw new IllegalArgumentException("Invalid ODE Engine provided to CSTR reactor.");
@@ -82,7 +82,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * odeEngine getter
      * @return odeEngine.
      */
-    public AbstractODESolver getOdeEngine() {
+    public AbstractNumericalODESolver getOdeEngine() {
         return this.g_odeEngine.clone();
     }
 
@@ -90,7 +90,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * odeEngine setter.
      * @param odeEngine odeEngine that implements AbstractODESolver
      */
-    public void setOdeEngine(AbstractODESolver odeEngine){
+    public void setOdeEngine(AbstractNumericalODESolver odeEngine){
         if(odeEngine == null) throw new IllegalArgumentException("Attempting to assign invalid ODE Solver");
         this.g_odeEngine = odeEngine.clone();
     }
@@ -142,7 +142,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
     public void calculateOutlet() {
         reset();
         this.outlet.mixture
-                .setConcentrations(this.g_odeEngine.solve(this.g_currentTime, this.outlet.mixture.getConcentrations(), this.generateDifferentialEquations()));
+                .setConcentrations(this.g_odeEngine.converge(this.g_currentTime, this.outlet.mixture.getConcentrations(), this.generateDifferentialEquations()));
     }
 
     /**

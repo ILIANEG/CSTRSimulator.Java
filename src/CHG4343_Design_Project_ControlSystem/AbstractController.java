@@ -2,6 +2,9 @@ package CHG4343_Design_Project_ControlSystem;
 
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
+/**
+ * Class represents and abstract controller.
+ */
 public abstract class AbstractController {
     private double setPoint;;
 
