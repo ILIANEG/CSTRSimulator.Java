@@ -90,25 +90,27 @@ public class SensorActuator {
         return this.deadTime;
     }
     public void trigger(double time, Controllable controlledObject) throws NumericalException {
-        if(!this.setPointChanges.isEmpty() && this.setPointChanges.peek().time <= time) {
-            this.controller.setSetPoint(this.setPointChanges.pop().value);
-        }
+        // Check for signals that are waiting in queue. If a signal passed the dead time, actuate it immediately.
         if(!this.processAdjustments.isEmpty() && this.deadTime <= time - this.processAdjustments.peek().time) {
             Signal qSignal = this.processAdjustments.pop();
             controlledObject.adjustControllableParameter(qSignal.value, this.id);
             this.g_lastProcessedSignal = qSignal;
         }
+        // Check if sensor is available to read (polling time)
         if(this.g_lastTimePolled == -1 || pollingTime <= time - g_lastTimePolled) {
+            // Check if signal can be actuated immediately
             if(this.g_lastProcessedSignal == null || this.deadTime <= time - g_lastProcessedSignal.time) {
                 Signal signal = new Signal(time,
                         this.controller.calculateControlSignal(time, controlledObject.getControllableParameter(this.id)));
                 controlledObject.adjustControllableParameter(signal.value, this.id);
                 this.g_lastProcessedSignal = signal;
             } else {
+                // Add signal to a queue if signal can not be actuated immediately
                 Signal signal = new Signal(time,
                         this.controller.calculateControlSignal(time, controlledObject.getControllableParameter(this.id)));
                 this.processAdjustments.add(signal);
             }
+            this.g_lastTimePolled = time;
         }
     }
     public boolean equals(Object comparator)

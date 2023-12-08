@@ -172,10 +172,11 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
     }
 
     /**
-     * Helper function to format data row before being added to the data storage.
+     * Helper function that formats data row before being added to the data storage.
+     * In essence, it simply puts time as first element of array and then copies the array of concentrations.
      * @param time
-     * @param concentrations
-     * @return array of data to prepared for data storage
+     * @param concentrations array of concentrations.
+     * @return array of data prepared for data storage.
      */
     protected double[] formatDataRow(double time, double[] concentrations) {
         double[] formattedData = new double[concentrations.length + 1];
@@ -185,6 +186,11 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         }
         return formattedData;
     }
+
+    /**
+     * Generates an array of differential equations for each species.
+     * @return array of lambda functions (XYFunction objects).
+     */
     protected XYFunction[] generateDifferentialEquations() {
         ChemicalSpecies[] tmpSpecies = this.outlet.mixture.getSpecies();
         XYFunction[] speciesFunctions = new XYFunction[this.outlet.mixture.getNumberOfSpecies()];
@@ -193,6 +199,10 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
         }
         return speciesFunctions;
     }
+
+    /**
+     * @return string representation of chemical reactor.
+     */
     @Override
     public String toString() {
         return "Inlet: " + this.inlet.toString() + "\n" + "Outlet: " + this.outlet.toString() + "\n" + "V: " + this.volume;

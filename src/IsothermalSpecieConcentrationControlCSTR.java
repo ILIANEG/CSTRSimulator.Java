@@ -4,9 +4,21 @@ import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 import CHG4343_Design_Project_ODESolver.AbstractODESolver;
 
+/**
+ * This class extends functionality of uncontrolled CSTR to enable a controlled run.
+ * This particular implementation allows to control single specie concentration, however
+ * The id system will allow to have multiple control parameters if implemented.
+ */
 public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontrolledTransientCSTR implements Controllable {
     private SensorActuator actuator;
     private ChemicalSpecies controlledSpecies;
+
+    /**
+     *
+     * @param actuator SensorActuator object.
+     * @param controlledSpecies species that will be controlled.
+     * @see IsothermalUncontrolledTransientCSTR for super() constructor.
+     */
     public IsothermalSpecieConcentrationControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, AbstractODESolver odeEngine,
                                                     SensorActuator actuator, ChemicalSpecies controlledSpecies){
         super(inlet, outlet, reaction, volume, odeEngine);
@@ -14,31 +26,83 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
         this.actuator = actuator.clone();
 
     }
-    public IsothermalSpecieConcentrationControlCSTR(IsothermalSpecieConcentrationControlCSTR source) throws NumericalException, ArrayException {
+
+    /**
+     * Copy constructor for isothermal CSTR with a single specie concentration control.
+     * @param source
+     */
+    public IsothermalSpecieConcentrationControlCSTR(IsothermalSpecieConcentrationControlCSTR source) {
         super(source);
         this.controlledSpecies = source.controlledSpecies;
         this.actuator = source.actuator.clone();
     }
-    public void setControls(SensorActuator actuator) throws IllegalArgumentException
+
+    /**
+     * Override of clone method in parent class.
+     * @return deep copy of the object.
+     */
+    @Override
+    public IsothermalSpecieConcentrationControlCSTR clone() {
+        return new IsothermalSpecieConcentrationControlCSTR(this);
+    }
+
+    /* Accessors and Mutators */
+
+    /**
+     * Actuator accessor.
+     * @return deep copy of actuator object.
+     */
+    public SensorActuator getActuator()
     {
-        if(actuator==null) throw new IllegalArgumentException("Attempted to pass a null actuator to reactor object");
+        return this.actuator.clone();
+    }
+
+    /**
+     * Actuator mutator.
+     * @param actuator SensorActuator object.
+     */
+    public void setActuator(SensorActuator actuator)
+    {
+        if(actuator==null) throw new IllegalArgumentException("Attempted to pass a null actuator to a reactor object");
         this.actuator = actuator.clone();
     }
 
-    public SensorActuator getControls()
+    /**
+     * Controlled species accessor.
+     * @return deep copy of controlled ChemicalSpecies object.
+     */
+    public ChemicalSpecies getControlledSpecies()
     {
-        return this.actuator;
+        return this.controlledSpecies.clone();
     }
 
-    //@Override
-    public void runForNTime(double dt, double runTime) {
-        //this.g_odeEngine.reset();
-        while(this.g_currentTime < runTime) {
+    /**
+     * Controlled species mutator.
+     * @param species SensorActuator object.
+     */
+    public void setControlledSpecies(ChemicalSpecies species)
+    {
+        if(species == null) throw new IllegalArgumentException("Attempted to pass a null control ChemicalSpecies to a reactor object");
+        this.controlledSpecies = this.controlledSpecies.clone();
+    }
+
+    /**
+     * Run CSTR for runTime amount of time, while control system is engaged.
+     * @param dt time step for data recording purposes.
+     * @param runTime total run time of a reactor.
+     * @param reset flag whether state should be reset before running reactor, this will not reset outlet concentrations
+     */
+    @Override
+    public void runForNTime(double dt, double runTime, boolean reset) {
+        if(reset) this.g_odeEngine.reset();
+        double localTimeCounter = 0;
+        while(localTimeCounter < runTime) {
             this.g_runData.addDataRow(formatDataRow(this.g_currentTime, this.outlet.mixture.getConcentrations()));
             this.outlet.mixture.setConcentrations(
                     this.g_odeEngine.integrate(this.g_currentTime, this.g_currentTime+dt, this.outlet.mixture.getConcentrations(),
                             this.generateDifferentialEquations()));
             this.actuator.trigger(this.g_currentTime, this);
+            localTimeCounter += dt;
             this.g_currentTime += dt;
         }
     }
@@ -50,29 +114,24 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
         return true;
     }
 
+    /**
+     * Controllable interface implementation. Adjust controlled parameter.
+     * @param value new parameter value.
+     * @param id
+     */
     @Override
     public void adjustControllableParameter(double value, int id) {
-        switch(id) {
-            case 0 :
-                if(value < 0) value = 0;
-                super.inlet.setVolumetricFlowrate(value);
-                super.outlet.setVolumetricFlowrate(value);
-        }
+        if(value < 0) value = 0;
+        super.inlet.setVolumetricFlowrate(value);
+        super.outlet.setVolumetricFlowrate(value);
     }
 
     @Override
     public double getControllableParameter(int id) {
-        switch(id) {
-            case 0:
-                return super.outlet.mixture.getConcentration(this.controlledSpecies);
-        }
-        return 0;
+        return super.outlet.mixture.getConcentration(this.controlledSpecies);
     }
     @Override
     public void performStepChange(double value, int id) {
-        switch(id) {
-            case 0:
-                super.inlet.mixture.setConcentration(this.controlledSpecies, value);
-        }
+        super.inlet.mixture.setConcentration(this.controlledSpecies, value);
     }
 }
