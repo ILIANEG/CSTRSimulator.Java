@@ -1,5 +1,6 @@
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 import CHG4343_Design_Project_DataStorage.NumericalDataStorage;
+import CHG4343_Design_Project_Mathematical.XYFunction;
 import CHG4343_Design_Project_ODESolver.*;
 
 /**

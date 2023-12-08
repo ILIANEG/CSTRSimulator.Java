@@ -1,69 +1,56 @@
 package CHG4343_Design_Project_ControlSystem;
+
+import java.util.LinkedList;
+
+/**
+ * Signal queue to store, add and take signals
+ */
 public class SignalQueue {
-    private Signal[] signals;
+    private LinkedList<Signal> signals; // linked list that stores signals
+
+    /**
+     * Constructor for signal queue, initializing an empty queue
+     */
     public SignalQueue() {
-        this.signals = new Signal[0];
+        this.signals = new LinkedList<Signal>();
     }
     public SignalQueue(SignalQueue source) {
-        this.signals = new Signal[source.signals.length];
-        for(int i = 0; i < this.signals.length; i++) {
-            this.signals[i] = source.signals[i].clone();
+        LinkedList<Signal> tmpList = new LinkedList<Signal>();
+        for(int i = 0; i < source.signals.size(); i++) {
+            tmpList.add(source.signals.get(i).clone());
         }
+        this.signals = tmpList;
     }
     public SignalQueue clone() {
         return new SignalQueue(this);
     }
     public int size() {
-        return signals.length;
+        return signals.size();
     }
     public boolean isEmpty() {
         return this.size() == 0;
     }
-    public boolean add(Signal s) {
-        if(s == null) return false;
-        Signal[] tmpSignals = new Signal[this.signals.length + 1];
-        for(int i = 0; i < signals.length; i++) {
-            tmpSignals[i] = this.signals[i];
-        }
-        tmpSignals[this.signals.length] = s.clone();
-        this.signals = tmpSignals;
-        return true;
+    public void add(Signal s) {
+        if(s == null) throw new IllegalArgumentException("Invalid signal is being added to the signal queue");
+        this.signals.add(s.clone());
     }
     public Signal pop() {
         if(this.isEmpty()) return null;
-        Signal[] tmpSignals = new Signal[this.signals.length - 1];
-        for(int i = 1; i < this.signals.length; i++) {
-            tmpSignals[i-1] = this.signals[i];
-        }
-        Signal retSignal = this.signals[0];
-        this.signals = tmpSignals;
+        Signal retSignal = this.signals.getFirst().clone();
+        this.signals.removeFirst();
         return retSignal;
     }
-    private void sort(Signal[] signals) {
-        if(signals == null) throw new IllegalArgumentException("Can not sort array of signals, array is null");
-        boolean sorted = false;
-        while(!sorted) {
-            sorted = true;
-            for(int i = 0; i < this.signals.length-1; i++) {
-                if(signals[i].time < signals[i+1].time) {
-                    sorted = false;
-                    Signal tmpSignal = signals[i];
-                    signals[i+1] = signals[i];
-                    signals[i] = tmpSignal;
-                }
-            }
-        }
-    }
+
     public Signal peek() {
         if(this.isEmpty()) return null;
-        return this.signals[0];
+        return this.signals.getFirst().clone();
     }
     public boolean equals(Object comparator) {
         if(comparator == null || comparator.getClass() != this.getClass()) return false;
-        SignalQueue signalQ = (SignalQueue) comparator;
-        if(this.signals.length != signalQ.signals.length) return false;
-        for(int i = 0; i < this.signals.length; i++) {
-            if(this.signals[i] != signalQ.signals[i]) return false;
+        SignalQueue s = (SignalQueue) comparator;
+        if(this.signals.size() != s.signals.size()) return false;
+        for(int i = 0; i < this.signals.size(); i++) {
+            if(!this.signals.get(i).equals(s.signals.get(i))) return false;
         }
         return true;
     }

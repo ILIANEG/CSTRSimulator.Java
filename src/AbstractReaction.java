@@ -1,7 +1,5 @@
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
-import CHG4343_Design_Project_CustomExcpetions.InvalidArrayDataException;
-import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
-import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_Mathematical.Function;
 
 import java.util.Arrays;
 import java.util.List;
@@ -158,7 +156,7 @@ public abstract class AbstractReaction {
     /**
      * Generate rate expression as a lambda function.
      * @param mixture ChemicalMixture object.
-     * @return lambda function (following Function interface)
+     * @return lambda function (following CHG4343_Design_Project_Mathematical.Function interface)
      */
     public abstract Function generateRateExpression(ChemicalMixture mixture);
 

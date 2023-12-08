@@ -1,7 +1,5 @@
 import CHG4343_Design_Project_ControlSystem.Controllable;
-import CHG4343_Design_Project_ControlSystem.SensorActuator;
-import CHG4343_Design_Project_CustomExcpetions.ArrayException;
-import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_ControlSystem.ControlElement;
 import CHG4343_Design_Project_ODESolver.AbstractODESolver;
 
 /**
@@ -12,7 +10,7 @@ import CHG4343_Design_Project_ODESolver.AbstractODESolver;
  * won't trigger the control system.
  */
 public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontrolledTransientCSTR implements Controllable {
-    private SensorActuator actuator;
+    private ControlElement actuator;
     private ChemicalSpecies controlledSpecies;
 
     /**
@@ -22,7 +20,7 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
      * @see IsothermalUncontrolledTransientCSTR for super() constructor.
      */
     public IsothermalSpecieConcentrationControlCSTR(Flow inlet, Flow outlet, AbstractReaction reaction, double volume, AbstractODESolver odeEngine,
-                                                    SensorActuator actuator, ChemicalSpecies controlledSpecies){
+                                                    ControlElement actuator, ChemicalSpecies controlledSpecies){
         super(inlet, outlet, reaction, volume, odeEngine);
         this.controlledSpecies = controlledSpecies.clone();
         this.actuator = actuator.clone();
@@ -54,7 +52,7 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
      * Actuator accessor.
      * @return deep copy of actuator object.
      */
-    public SensorActuator getActuator()
+    public ControlElement getActuator()
     {
         return this.actuator.clone();
     }
@@ -63,7 +61,7 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
      * Actuator mutator.
      * @param actuator SensorActuator object.
      */
-    public void setActuator(SensorActuator actuator)
+    public void setActuator(ControlElement actuator)
     {
         if(actuator==null) throw new IllegalArgumentException("Attempted to pass a null actuator to a reactor object");
         this.actuator = actuator.clone();

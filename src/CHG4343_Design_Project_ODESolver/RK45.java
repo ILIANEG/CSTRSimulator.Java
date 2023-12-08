@@ -3,6 +3,7 @@ package CHG4343_Design_Project_ODESolver;
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_Mathematical.XYFunction;
 
 public class RK45 extends AbstractODESolver {
     public static final double[][] butcherTableau = {{0}, {1./4,1./4}, {3./8,3./32,9./32},
@@ -59,6 +60,7 @@ public class RK45 extends AbstractODESolver {
             }
             double newStep = calculateStepSize(zii, yii);
             localConvergence = this.g_dx <= newStep;
+            newStep = this.g_dx;
             this.setStepSize(newStep);
             iterator++;
         }
@@ -69,7 +71,7 @@ public class RK45 extends AbstractODESolver {
         double maxError = Double.NEGATIVE_INFINITY;
         for(int i = 0; i < z.length; i++) {
             double delta = Math.abs(z[i] - y[i]);
-            if( maxError < delta) maxError = delta;
+            if( maxError < delta || delta == 0) maxError = delta;
         }
         return maxError;
     }

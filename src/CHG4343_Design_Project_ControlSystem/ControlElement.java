@@ -2,16 +2,19 @@ package CHG4343_Design_Project_ControlSystem;
 
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 
-public class SensorActuator {
+/**
+ * Class simulating both sensor and actuator simultaneously.
+ */
+public class ControlElement {
     private AbstractController controller;
-    private SignalQueue processAdjustments;
+    private SignalQueue processAdjustments; // queue of control signals
     private Signal g_lastProcessedSignal;
     private double g_lastTimePolled;
     private SignalQueue setPointChanges;
     private double deadTime;
     private double pollingTime;
     private int id;
-    public SensorActuator(AbstractController controller, double deadTime, double pollingTime, int id) throws NumericalException {
+    public ControlElement(AbstractController controller, double deadTime, double pollingTime, int id) throws NumericalException {
         if(controller == null) throw new IllegalArgumentException("Controller is null while initializing sensor/actuator");
         if(deadTime < 0) throw new NumericalException("Dead Time is less than zero");
         if(id < 0) throw new IllegalArgumentException("Actuator ID must be an integer between 0 and inf, while " + id + " was passed");
@@ -23,7 +26,7 @@ public class SensorActuator {
         this.id = id;
         this.reset();
     }
-    public SensorActuator(AbstractController controller, double deadTime, double pollingTime, int id, SignalQueue setPointChanges) throws NumericalException {
+    public ControlElement(AbstractController controller, double deadTime, double pollingTime, int id, SignalQueue setPointChanges) throws NumericalException {
         if(controller == null) throw new IllegalArgumentException("Controller is null while initializing sensor/actuator");
         if(deadTime < 0) throw new NumericalException("Dead Time is less than zero");
         if(id < 0) throw new IllegalArgumentException("Actuator ID must be an integer between 0 and inf, while " + id + " was passed");
@@ -36,7 +39,7 @@ public class SensorActuator {
         this.id = id;
         this.reset();
     }
-    public SensorActuator(SensorActuator source) throws IllegalArgumentException
+    public ControlElement(ControlElement source) throws IllegalArgumentException
     {
         if(source == null) throw new IllegalArgumentException("Source object in reactor copy constructor is null");
         this.controller = source.controller.clone();
@@ -48,9 +51,9 @@ public class SensorActuator {
         this.reset();
     }
 
-    public SensorActuator clone()
+    public ControlElement clone()
     {
-        return new SensorActuator(this);
+        return new ControlElement(this);
     }
     public void reset() {
         this.g_lastProcessedSignal = null;
@@ -116,7 +119,7 @@ public class SensorActuator {
     public boolean equals(Object comparator)
     {
         if(comparator == null || comparator.getClass() != this.getClass()) return false;
-        SensorActuator obj = ((SensorActuator)comparator);
+        ControlElement obj = ((ControlElement)comparator);
         return obj.id == this.id && this.deadTime == obj.deadTime && this.controller.equals(obj.controller) &&
                 this.processAdjustments.equals(obj.processAdjustments) && this.setPointChanges.equals(obj.setPointChanges);
     }

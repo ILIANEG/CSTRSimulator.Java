@@ -1,5 +1,5 @@
 import CHG4343_Design_Project_ControlSystem.PIController;
-import CHG4343_Design_Project_ControlSystem.SensorActuator;
+import CHG4343_Design_Project_ControlSystem.ControlElement;
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
 import CHG4343_Design_Project_CustomExcpetions.InvalidNotationException;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
@@ -16,8 +16,8 @@ public class TestCase_2_Driver {
                 new double[]{-1}, new double[]{1}, 0.2);
         Flow inlet = new Flow(new ChemicalMixture(new ChemicalSpecies[]{a}, new double[]{0.2}), 0.05);
         Flow outlet = new Flow(0.05);
-        SensorActuator sensor = new SensorActuator(new PIController(0.04, 0.64, 4, 0.2), 0.2, 0, 0);
-        RK45 rk45 = new RK45(0.001, 1E-10, 1000000);
+        ControlElement sensor = new ControlElement(new PIController(0.04, 0.64, 4, 0.2), 0.2, 0, 0);
+        RK45 rk45 = new RK45(0.001, 1E-10, 100000);
         IsothermalSpecieConcentrationControlCSTR cstr = new IsothermalSpecieConcentrationControlCSTR(inlet, outlet, reaction, 1, rk45, sensor, a);
         cstr.runForNTime(0.1, 300, true);
         System.out.println(cstr);

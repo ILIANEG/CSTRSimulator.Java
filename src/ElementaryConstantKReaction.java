@@ -1,6 +1,6 @@
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
-import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
 import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_Mathematical.Function;
 
 /**
  * Implements Abstract Reaction to represent elementary, irreversible reaction with constant k (k is not calculated based on
