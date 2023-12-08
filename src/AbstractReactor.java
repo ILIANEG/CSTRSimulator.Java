@@ -124,7 +124,7 @@ public abstract class AbstractReactor {
      * @param outlet Flow object
      * @return return formatted flow object
      */
-    protected Flow formatOutletFlow(Flow outlet) {
+    private Flow formatOutletFlow(Flow outlet) {
         ChemicalSpecies[] inlet = this.inlet.getMixture().getSpecies();
         ChemicalSpecies[] reactants = this.getReaction().getReactants();
         ChemicalSpecies[] products = this.getReaction().getProducts();

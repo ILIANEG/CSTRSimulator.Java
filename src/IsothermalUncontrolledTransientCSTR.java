@@ -110,6 +110,8 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * @reset flag to reset global parameters. DOES NOT reset the outlet conditions.
      */
     public void runForNTime(double dt, double runTime, boolean reset) {
+        if(dt <= 0) throw new IllegalArgumentException("dt can not be negative or equal to 0");
+        if(runTime < 0) throw new IllegalArgumentException("Run time can not be negative");
         if(reset) this.reset();
         double localTimeCounter = 0;
         while(localTimeCounter < runTime) {
@@ -126,6 +128,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * @param dt time step for data recording purposes.
      */
     public void runTillSteadyState(double dt, boolean reset) {
+        if(dt <= 0) throw new IllegalArgumentException("dt can not be negative or equal to 0");
         if(reset) this.reset();
         while(!this.g_odeEngine.isConverged()) {
             g_runData.addDataRow(formatDataRow(this.g_currentTime, this.outlet.mixture.getConcentrations()));
@@ -164,10 +167,11 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      */
     protected String[] generateHeaders() {
         ChemicalSpecies[] species = this.outlet.mixture.getSpecies();
-        String[] headers = new String[species.length + 1];
+        String[] headers = new String[species.length + 2];
         headers[0] = "t";
+        headers[1] = "v";
         for(int i = 0; i < species.length; i++) {
-            headers[i+1] = species[i].getName();
+            headers[i+2] = species[i].getName();
         }
         return headers;
     }
@@ -180,10 +184,11 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * @return array of data prepared for data storage.
      */
     protected double[] formatDataRow(double time, double[] concentrations) {
-        double[] formattedData = new double[concentrations.length + 1];
+        double[] formattedData = new double[concentrations.length + 2];
         formattedData[0] = time;
+        formattedData[1] = this.outlet.getVolumetricFlowrate();
         for(int i = 0; i < concentrations.length; i++) {
-            formattedData[i+1] = concentrations[i];
+            formattedData[i+2] = concentrations[i];
         }
         return formattedData;
     }
@@ -192,7 +197,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * Generates an array of differential equations for each species.
      * @return array of lambda functions (XYFunction objects).
      */
-    protected XYFunction[] generateDifferentialEquations() {
+    public XYFunction[] generateDifferentialEquations() {
         ChemicalSpecies[] tmpSpecies = this.outlet.mixture.getSpecies();
         XYFunction[] speciesFunctions = new XYFunction[this.outlet.mixture.getNumberOfSpecies()];
         for(int i = 0; i < this.outlet.mixture.getNumberOfSpecies(); i++) {

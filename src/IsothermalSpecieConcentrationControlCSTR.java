@@ -96,6 +96,8 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
     public void runForNTime(double dt, double runTime, boolean reset) {
         if(this.actuator.getDeadTime() < dt) throw new IllegalArgumentException("Dead time is larger then time" +
                 "interval dt, wt which control system will be triggered. Lower dt");
+        if(dt <= 0) throw new IllegalArgumentException("dt can not be negative or equal to 0");
+        if(runTime < 0) throw new IllegalArgumentException("Run time can not be negative");
         if(reset) this.g_odeEngine.reset();
         double localTimeCounter = 0;
         while(localTimeCounter < runTime) {

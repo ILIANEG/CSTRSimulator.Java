@@ -149,3 +149,47 @@ classDiagram
         +calculateEpsilone(double[] z, double[] y) double
         +claculateSTepSize(double[] z, double[] y) double
     }
+    class AbstractController {
+        <<Abstract>>
+        -double setPoint
+        +setSetPoint(double setPoint)
+        +e(doble value) double
+        +equals(Object comparator) boolean
+        +calculateControlSignal(double t, double value) double*
+        +tune(k, tau, theta) *
+        +clone() *
+    }
+    class PIController {
+        -double kC
+        -double tauI
+        -double g_iPrev
+        -double g_tPrev
+    }
+
+    %% Interfaces
+    class Function {
+        <<Interface>>
+        double evaluate(double[] x)
+    }
+    class XYFunction {
+        <<Interface>>
+        double evaluate(double x, double[] y)
+    }
+    class Controllable {
+        <<interface>>
+        adjustControllableParameter(double value, int id)
+        getControllableParameter(int id) double
+        performStepChange(double value, int id)
+    }
+    class P {
+        <<interface>>
+        double calculateP(double Kc, double e)
+    }
+    class I {
+        <<interface>>
+        double calculateI(double Kc, double tauI, double e, double t, double tPrev, double iPrev)
+    }
+    class D {
+        <<Interface>>
+        double calculateD(double Kc, double t, double tPrev, double y, double yPrev)
+    }

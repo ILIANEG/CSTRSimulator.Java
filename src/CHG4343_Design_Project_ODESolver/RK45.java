@@ -10,11 +10,11 @@ import CHG4343_Design_Project_Mathematical.XYFunction;
  */
 public class RK45 extends AbstractNumericalODESolver {
     /* Butcher tableaus for RK45 */
-    public static final double[][] butcherTableau = {{0}, {1./4,1./4}, {3./8,3./32,9./32},
+    protected static final double[][] butcherTableauK = {{0}, {1./4,1./4}, {3./8,3./32,9./32},
             {12./13,1923./2197,-7200./2197,7296./2197},{1,439./216,-8,3680./513,-845./4104},
             {1./2,-8./27,2,-3544./2565,1859./4104,-11./40}};
-    public static final double[] butcherTableau4thOrder = {25./216,0,1408./2565,2197./4104,-1./5,0};
-    public static final double[] butcherTableau5thOrder = {16./135,0,6656./12825,28561./56430,-9./50,2./55};
+    protected static final double[] butcherTableau4thOrder = {25./216,0,1408./2565,2197./4104,-1./5,0};
+    protected static final double[] butcherTableau5thOrder = {16./135,0,6656./12825,28561./56430,-9./50,2./55};
 
     /**
      * RK45 Constructor.
@@ -63,19 +63,19 @@ public class RK45 extends AbstractNumericalODESolver {
         // While local convergence is not achieved.
         while(!localConvergence) {
             // Check for maximum iterations exceeded.
-            if(this.getMaxIteration() <= iterator) throw new ODESolverException("Maximum iterations exceeded");
+            if(this.getMaxIteration() <= iterator) throw new ODESolverException("Maximum iterations in step() are exceeded, lower the tolerance or increase max iterations.");
             // Arrays of k's.
             double[][] k = new double[6][y.length];
             // For each k.
             for (int i = 0; i < k.length; i++) {
                 // Modify value of x and record to temporary variable.
-                double tmpX = x + RK45.butcherTableau[i][0] * this.g_dx;
+                double tmpX = x + RK45.butcherTableauK[i][0] * this.g_dx;
                 double[] tmpY = new double[y.length];
                 // Modify each value of y in temporary array.
                 for (int j = 0; j < k[i].length; j++) {
                     tmpY[j] = y[j];
-                    for (int b = 1; b < RK45.butcherTableau[i].length; b++) {
-                        tmpY[j] += RK45.butcherTableau[i][b] * k[b - 1][j];
+                    for (int b = 1; b < RK45.butcherTableauK[i].length; b++) {
+                        tmpY[j] += RK45.butcherTableauK[i][b] * k[b - 1][j];
                     }
                 }
                 // calculate k[i]
@@ -97,7 +97,7 @@ public class RK45 extends AbstractNumericalODESolver {
             // check local convergence.
             localConvergence = this.g_dx <= newStep;
             // if overflow encountered
-            if(newStep == Double.POSITIVE_INFINITY) throw new ODESolverException("Overflow encountered, try to lower tolerance");
+            if(newStep == Double.POSITIVE_INFINITY) throw new ODESolverException("Overflow encountered, try to increase tolerance.");
             this.g_dx = newStep;
             iterator++;
         }
@@ -129,6 +129,6 @@ public class RK45 extends AbstractNumericalODESolver {
      */
     private double calculateStepSize(double[] z, double[] y) {
         return this.g_dx * Math.pow((this.getTolerance()*this.g_dx)
-                /(2*calculateEpsilone(z, y)), 1./4);
+                /(2*this.calculateEpsilone(z, y)), 1./4);
     }
 }
