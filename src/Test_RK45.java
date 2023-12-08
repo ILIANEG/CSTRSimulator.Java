@@ -9,9 +9,11 @@ public class Test_RK45 {
         ODES[0] = (double x, double[] y)-> 9.8-0.196*y[0];
 
         double[] y =new double[1];
-        y[0]=1;
+        y[0]=48;
         double[] holder;
         holder=tester.converge(1,y,ODES);
+        System.out.println(holder[0]);
+        holder= tester.integrate(0, 4, y, ODES);
         System.out.println(holder[0]);
     }
 }
