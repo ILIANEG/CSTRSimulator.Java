@@ -109,7 +109,9 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * @param runTime total run time of a reactor.
      * @reset flag to reset global parameters. DOES NOT reset the outlet conditions.
      */
-    public void runForNTime(double dt, double runTime, boolean reset) {
+    public void runForNTime(double dt, double runTime, boolean reset) throws NumericalException {
+        if (dt<=0) throw new NumericalException("dt cannot be negative or zero");
+        if (runTime<=0) throw new NumericalException("runtime cannot be negative or zero");
         if(reset) this.reset();
         double localTimeCounter = 0;
         while(localTimeCounter < runTime) {
@@ -125,8 +127,9 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
      * Runs reactor till steady state is achieved. Records run result every dt period of time.
      * @param dt time step for data recording purposes.
      */
-    public void runTillSteadyState(double dt, boolean reset) {
+    public void runTillSteadyState(double dt, boolean reset) throws NumericalException {
         if(reset) this.reset();
+        if (dt<=0) throw new NumericalException("dt cannot be negative or zero");
         while(!this.g_odeEngine.isConverged()) {
             g_runData.addDataRow(formatDataRow(this.g_currentTime, this.outlet.mixture.getConcentrations()));
             this.outlet.mixture

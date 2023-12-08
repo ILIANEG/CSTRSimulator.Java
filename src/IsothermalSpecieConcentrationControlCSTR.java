@@ -1,5 +1,6 @@
 import CHG4343_Design_Project_ControlSystem.Controllable;
 import CHG4343_Design_Project_ControlSystem.ControlElement;
+import CHG4343_Design_Project_CustomExcpetions.NumericalException;
 import CHG4343_Design_Project_ODESolver.AbstractNumericalODESolver;
 
 /**
@@ -93,7 +94,9 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
      * @param reset flag whether state should be reset before running reactor, this will not reset outlet concentrations
      */
     @Override
-    public void runForNTime(double dt, double runTime, boolean reset) {
+    public void runForNTime(double dt, double runTime, boolean reset) throws NumericalException {
+        if (dt<=0) throw new NumericalException("dt cannot be negative or zero");
+        if (runTime<=0) throw new NumericalException("runtime cannot be negative or zero");
         if(this.actuator.getDeadTime() < dt) throw new IllegalArgumentException("Dead time is larger then time" +
                 "interval dt, wt which control system will be triggered. Lower dt");
         if(reset) this.g_odeEngine.reset();
