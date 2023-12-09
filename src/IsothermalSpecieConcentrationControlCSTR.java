@@ -33,7 +33,7 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
      */
     public IsothermalSpecieConcentrationControlCSTR(IsothermalSpecieConcentrationControlCSTR source) {
         super(source);
-        this.controlledSpecies = source.controlledSpecies;
+        this.controlledSpecies = source.controlledSpecies.clone();
         this.actuator = source.actuator.clone();
     }
 
@@ -88,12 +88,11 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
 
     /**
      * Run CSTR for runTime amount of time, while control system is engaged.
-     * @param dt time step for data recording purposes.
+     * @param dt time step at which control system will be triggered.
      * @param runTime total run time of a reactor.
      * @param reset flag whether state should be reset before running reactor, this will not reset outlet concentrations
      */
-    @Override
-    public void runForNTime(double dt, double runTime, boolean reset) {
+    public void controlledRunForNTime(double dt, double runTime, boolean reset) {
         if(this.actuator.getDeadTime() < dt) throw new IllegalArgumentException("Interval dt is larger then time" +
                 " control element dead time, this will introduce additional lag to the system. Lower dt. If actuator lag needs to be simulated, set " +
                 "control element polling time to required lag.");
@@ -101,6 +100,7 @@ public class IsothermalSpecieConcentrationControlCSTR extends IsothermalUncontro
         if(runTime < 0) throw new IllegalArgumentException("Run time can not be negative");
         if(reset) this.g_odeEngine.reset();
         double localTimeCounter = 0;
+        this.g_runData.addDataRow(this.formatDataRow(this.g_currentTime, this.outlet.mixture.getConcentrations()));
         while(localTimeCounter < runTime) {
             this.g_runData.addDataRow(formatDataRow(this.g_currentTime, this.outlet.mixture.getConcentrations()));
             this.outlet.mixture.setConcentrations(

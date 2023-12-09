@@ -2,16 +2,31 @@
 title: CHG4343 Project
 ---
 classDiagram
-    %% Relationship between concrete classes
+    %% Aggregation
     ChemicalMixture o-- ChemicalSpecies
     Flow o-- ChemicalMixture
     AbstractReactor o-- AbstractReaction
+    AbstractReactor o-- Flow
     IsothermalUncontrolledTransientCSTR o-- AbstractNumericalODESolver
+    IsothermalSpeciesConcentrationControlCSTR o-- ControlElement
+    IsothermalSpeciesConcentrationControlCSTR o-- NumericalDataStorage
+    ControlElement o-- AbstractController
+    ControlElement o-- SignalQueue
 
-    %% IsA relationships
+    %% Composition
+    SignalQueue *-- Signal
+
+    %% Inheritance
     AbstractReaction <|-- ElementaryConstantKReaction
     AbstractNumericalODESolver <|-- RK45
     AbstractReactor <|-- IsothermalUncontrolledTransientCSTR
+    IsothermalUncontrolledTransientCSTR <|-- IsothermalSpeciesConcentrationControlCSTR
+    AbstractController <|-- PIController
+
+    %% Realizations
+    PIController ..|> P
+    PIController ..|> I
+    IsothermalSpeciesConcentrationControlCSTR ..|> Controllable
 
     class ChemicalSpecies {
         -double molarMass
@@ -118,6 +133,20 @@ classDiagram
         #generateHeaders() String[]
         #formatDataRow(double time, double[] concentrations) double[]
     }
+    class IsothermalSpeciesConcentrationControlCSTR {
+        -ControlElement actuator
+        -ChemicalSpecies controlledSpecies
+        +clone(): IsothermalSpeciesConcentrationControlCSTR
+        +getActuator() ControlElement
+        +setActuator(ControlElement actuator)
+        +getControlledSpecies() ChemicalSpecies
+        +setControlledSpecies(ChemicalSpecies species)
+        +controlledRunForNTime(double dt, double runTime, boolean reset)
+        +equals(Object comparator)
+        +adjustControllableParameter(double value, int id)
+        +getControllableParameter(int id) double
+        +performStepChange(double value, int id)
+    }
     class AbstractNumericalODESolver {
         <<Abstract>>
         -double dx0
@@ -164,6 +193,56 @@ classDiagram
         -double tauI
         -double g_iPrev
         -double g_tPrev
+        +clone() PIController
+        +reset()
+        +tune(double k, double tau, double theta)
+        +calculateControlSignal(double t, double value) double
+        +calculateI(double kC, double tauI, double e, double t, double tPrev, double iPrev) double
+        +calculateP(double kC double e) double
+    }
+    class ControlElement {
+        -AbstractController controller
+        -SignalQueue g_controlSignals
+        -Signal g_lastProcessedSignal
+        -double deadTime
+        -double pollingTime
+        -int id
+        +clone() ControlElement
+        +reset()
+        +setController(AbstractController)
+        +getController() AbstractCOntroller
+        +setId(int id)
+        +getId() int
+        +setDeadTime(double deadTime)
+        +getDeadTime() double
+        +setPollingTime(double pollingTime)
+        +getPollingTime() double
+        +trigger(double time, Controllable controlledObject)
+        +equals(Object comparator) boolean
+    }
+    class SignalQueue {
+        - LinkedList~Signal~ signals
+        +clone() SignalQueue
+        +size() int
+        +isEmpty() boolean
+        +add(Signal s)
+        +pop() Signal
+        +peek() Signal
+        +equals boolean
+    }
+    class Signal {
+        +double time
+        +double value
+        +clone() Signal
+        +equals(Object comparator)
+    }
+    class NumericalDataStorage {
+        -String[] headers
+        +getHeaders() String[]
+        +getRow() String[]
+        +addRow(double[] dataRow)
+        +toString() String
+        +writeToFile(String filePath)
     }
 
     %% Interfaces

@@ -163,7 +163,7 @@ public class IsothermalUncontrolledTransientCSTR extends AbstractReactor {
 
     /**
      * Generates headers for data storage.
-     * @return String of data headers in form of [t, A, B, ..., N]
+     * @return String of data headers in form of [t, v, A, B, ..., N]
      */
     protected String[] generateHeaders() {
         ChemicalSpecies[] species = this.outlet.mixture.getSpecies();

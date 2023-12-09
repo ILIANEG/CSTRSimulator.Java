@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 public class NumericalDataStorage {
-    public final String[] headers;
+    private final String[] headers;
     private LinkedList<String[]> numericalData;
     public NumericalDataStorage(String[] headers) throws ArrayException {
         if(headers == null || headers.length == 0) throw new ArrayException("Headers array in data storage object is empty");
