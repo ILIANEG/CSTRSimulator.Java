@@ -67,10 +67,15 @@ public class ElementaryConstantKReaction extends AbstractReaction {
     public double calculateReactionRate(ChemicalMixture mixture) {
         if(mixture == null) return 0;
         ChemicalSpecies[] reactants = this.getReactants();
+        ChemicalSpecies[] products = this.getProducts();
         double[] reactantsStoichiometry = this.getReactantsStoichiometry();
+        double[] productStoichiometry = this.getProductsStoichiometry();
         double reactionRate = this.rateConstant;
         for(int i = 0; i < reactants.length; i++) {
             reactionRate *= Math.pow(mixture.getConcentration(reactants[i]), Math.abs(reactantsStoichiometry[i]));
+        }
+        for(int i = 0; i < products.length; i++) {
+            reactionRate *= Math.pow(mixture.getConcentration(products[i]), Math.abs(productStoichiometry[i]));
         }
         return reactionRate;
     }
