@@ -130,7 +130,8 @@ public abstract class AbstractNumericalODESolver {
         double x = x0;
         int iterator = 0;
         while(!this.isConverged()) {
-            if(this.maxIterations <= iterator) throw new ODESolverException("Maximum number of iterations reached before convergence, try to increase convergence or maximum steps number");
+            if(this.maxIterations <= iterator) throw new ODESolverException("Maximum number of iterations reached before convergence, try to increase convergence or maximum steps number. " +
+                    "Note: ODE might be divergent, and won't be able to converge at all");
             yi = this.step(x, yi, dydx);
             x += this.g_dx;
             iterator++;

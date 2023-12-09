@@ -96,9 +96,7 @@ public class RK45 extends AbstractNumericalODESolver {
             double newStep = calculateStepSize(zii, yii);
             // check local convergence.
             localConvergence = this.g_dx <= newStep;
-            // if overflow encountered
-            if(newStep == Double.POSITIVE_INFINITY) throw new ODESolverException("Overflow encountered, try to increase tolerance.");
-            this.g_dx = newStep;
+            if(!localConvergence) this.g_dx = newStep;
             iterator++;
         }
         // calculate global epsilon (convergence)
@@ -128,7 +126,7 @@ public class RK45 extends AbstractNumericalODESolver {
      * @return
      */
     private double calculateStepSize(double[] z, double[] y) {
-        return this.g_dx * Math.pow((this.getTolerance()*this.g_dx)
-                /(2*this.calculateEpsilone(z, y)), 1./4);
+        return this.g_dx * Math.max(Math.min(Math.pow((this.getTolerance()*this.g_dx)
+                /(2*this.calculateEpsilone(z, y)), 1./4), 3), 0.5);
     }
 }

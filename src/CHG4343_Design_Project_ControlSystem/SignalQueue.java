@@ -40,7 +40,6 @@ public class SignalQueue {
         this.signals.removeFirst();
         return retSignal;
     }
-
     public Signal peek() {
         if(this.isEmpty()) return null;
         return this.signals.getFirst().clone();
