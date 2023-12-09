@@ -7,7 +7,7 @@ import CHG4343_Design_Project_CustomExcpetions.NumericalException;
  */
 public class ControlElement {
     private AbstractController controller;
-    private SignalQueue g_processAdjustments; // queue of control signals
+    private SignalQueue g_controlSignals; // queue of control signals
     private Signal g_lastProcessedSignal;
     private double g_lastTimePolled;
     private double deadTime;
@@ -40,7 +40,7 @@ public class ControlElement {
     public ControlElement(ControlElement source) {
         if(source == null) throw new IllegalArgumentException("Source object in reactor copy constructor is null");
         this.controller = source.controller.clone();
-        this.g_processAdjustments = source.g_processAdjustments.clone();
+        this.g_controlSignals = source.g_controlSignals.clone();
         this.deadTime = source.deadTime;
         this.pollingTime = source.pollingTime;
         this.id = source.id;
@@ -56,7 +56,7 @@ public class ControlElement {
      * Reset global variables.
      */
     public void reset() {
-        this.g_processAdjustments = new SignalQueue();
+        this.g_controlSignals = new SignalQueue();
         this.g_lastProcessedSignal = null;
         this.g_lastTimePolled = -1;
     }
@@ -111,8 +111,8 @@ public class ControlElement {
      */
     public void trigger(double time, Controllable controlledObject) {
         // Check for signals that are waiting in queue. If a signal passed the dead time, actuate it immediately.
-        if(!this.g_processAdjustments.isEmpty() && this.deadTime <= time - this.g_processAdjustments.peek().time) {
-            Signal qSignal = this.g_processAdjustments.pop();
+        if(!this.g_controlSignals.isEmpty() && this.deadTime <= time - this.g_controlSignals.peek().time) {
+            Signal qSignal = this.g_controlSignals.pop();
             controlledObject.adjustControllableParameter(qSignal.value, this.id);
             this.g_lastProcessedSignal = qSignal;
         }
@@ -128,7 +128,7 @@ public class ControlElement {
                 // Add signal to a queue if signal can not be actuated immediately
                 Signal signal = new Signal(time,
                         this.controller.calculateControlSignal(time, controlledObject.getControllableParameter(this.id)));
-                this.g_processAdjustments.add(signal);
+                this.g_controlSignals.add(signal);
             }
             this.g_lastTimePolled = time;
         }
@@ -138,6 +138,6 @@ public class ControlElement {
         if(comparator == null || comparator.getClass() != this.getClass()) return false;
         ControlElement obj = ((ControlElement)comparator);
         return obj.id == this.id && this.deadTime == obj.deadTime && this.controller.equals(obj.controller) &&
-                this.g_processAdjustments.equals(obj.g_processAdjustments);
+                this.g_controlSignals.equals(obj.g_controlSignals);
     }
 }

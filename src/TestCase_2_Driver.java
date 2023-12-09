@@ -20,10 +20,10 @@ public class TestCase_2_Driver {
         ControlElement sensor = new ControlElement(new PIController(0.04, 0.64, 4, 0.2), 0.2, 0, 0);
         RK45 rk45 = new RK45(0.001, 1E-10, 1E-5, 100000);
         IsothermalSpecieConcentrationControlCSTR cstr = new IsothermalSpecieConcentrationControlCSTR(inlet, outlet, reaction, 1, rk45, sensor, a);
-        cstr.runForNTime(0.1, 300, true);
+        cstr.controlledRunForNTime(0.1, 300,true);
         System.out.println(cstr);
         cstr.performStepChange(1.2, 0);
-        cstr.runForNTime(0.1, 300, false);
+        cstr.controlledRunForNTime(0.1, 300,false);
         System.out.println(cstr);
         Scanner s = new Scanner(System.in);
         boolean exported = false;
