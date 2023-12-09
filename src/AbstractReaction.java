@@ -1,11 +1,13 @@
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
-import CHG4343_Design_Project_CustomExcpetions.InvalidArrayDataException;
-import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
-import CHG4343_Design_Project_CustomExcpetions.NumericalException;
+import CHG4343_Design_Project_Mathematical.Function;
 
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * Abstract reaction class.
+ */
 public abstract class AbstractReaction {
-    /* TODO prevent adding same species in reactants and products
-    *  TODO add more detailed comments */
     /* All variables announced as final since they should not change over the lifetime of reaction object
     * In other words, variables do not represent state, but rather "immutable characteristics" of the reaction. */
     private final ChemicalSpecies[] reactants;
@@ -18,10 +20,9 @@ public abstract class AbstractReaction {
      * @param products Array of ChemicalSpecies representing products.
      * @param reactantsStoichiometry Array of doubles representing reactants stoichiometric ratios.
      * @param productsStoichiometry Array of doubles representing product stoichiometric ratios.
-     * @throws ArrayException If an array or an element of the array is invalid.
      */
     public AbstractReaction(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactantsStoichiometry,
-                            double[] productsStoichiometry) throws ArrayException {
+                            double[] productsStoichiometry) {
         // Data validation.
         AbstractReaction.validateData(reactants, products, reactantsStoichiometry, productsStoichiometry);
         this.reactants = new ChemicalSpecies[reactants.length];
@@ -37,12 +38,18 @@ public abstract class AbstractReaction {
             this.productsStoichiometry[i] = productsStoichiometry[i];
         }
     }
-    public AbstractReaction(AbstractReaction source) throws NullPointerException {
-        if(source == null) throw new NullPointerException("Source object in copy constructor of Reaction is null");
+
+    /**
+     * Abstract reaction copy constructor
+     * @param source Abstract Rector source object
+     */
+    public AbstractReaction(AbstractReaction source) {
+        if(source == null) throw new IllegalArgumentException("Source object in copy constructor of Reaction is null");
         this.reactants = new ChemicalSpecies[source.reactants.length];
         this.products = new ChemicalSpecies[source.products.length];
         this.reactantsStoichiometry = new double[source.reactantsStoichiometry.length];
         this.productsStoichiometry = new double[source.productsStoichiometry.length];
+        // Deep copying arrays
         for(int i = 0; i < this.reactants.length; i++) {
             this.reactants[i] = source.reactants[i].clone();
             this.reactantsStoichiometry[i] = source.reactantsStoichiometry[i];
@@ -52,33 +59,56 @@ public abstract class AbstractReaction {
             this.productsStoichiometry[i] = source.productsStoichiometry[i];
         }
     }
+    // Abstract clone method
     abstract public AbstractReaction clone();
 
     /* Accessor and Mutators */
 
+    /**
+     * @return array of reactant species.
+     */
     public ChemicalSpecies[] getReactants() {
         ChemicalSpecies[] tmpReactants = new ChemicalSpecies[this.reactants.length];
+        // deep copy the array of species
         for(int i = 0; i < this.reactants.length; i++) {
             tmpReactants[i] = this.reactants[i].clone();
         }
         return tmpReactants;
     }
+
+    /**
+     *
+     * @return array of product species.
+     */
     public ChemicalSpecies[] getProducts() {
         ChemicalSpecies[] tmpProducts = new ChemicalSpecies[this.products.length];
+        // deep copying the array of species
         for(int i = 0; i < this.products.length; i++) {
             tmpProducts[i] = this.products[i].clone();
         }
         return tmpProducts;
     }
+
+    /**
+     *
+     * @return array of reactant stoichiometries.
+     */
     public double[] getReactantsStoichiometry() {
         double[] tmpReactantsStoichiometry = new double[this.reactantsStoichiometry.length];
+        // Deep copying the array
         for(int i = 0; i < this.reactantsStoichiometry.length; i++) {
             tmpReactantsStoichiometry[i] = this.reactantsStoichiometry[i];
         }
         return tmpReactantsStoichiometry;
     }
+
+    /**
+     *
+     * @return array of product stoichiometries.
+     */
     public double[] getProductsStoichiometry() {
         double[] tmpProductsStoichiometry = new double[this.reactantsStoichiometry.length];
+        // Deep copying the array
         for(int i = 0; i < this.productsStoichiometry.length; i++) {
             tmpProductsStoichiometry[i] = this.productsStoichiometry[i];
         }
@@ -108,43 +138,66 @@ public abstract class AbstractReaction {
         }
         return false;
     }
-    public abstract double calculateRateConstant(ChemicalMixture mixture);
-    public abstract double calculateReactionRate(ChemicalMixture mixture);
-    public abstract Function generateRateExpression(ChemicalMixture mixture);
+
     /**
-     * Custom validator
+     * Method calculated the rate constant of the reaction
+     * @param mixture ChemicalMixture object
+     * @return rate constant of the reaction
+     */
+    public abstract double calculateRateConstant(ChemicalMixture mixture);
+
+    /**
+     * Method calculates the rate of the reaction.
+     * @param mixture ChemicalMixture object
+     * @return rate of the reaction.
+     */
+    public abstract double calculateReactionRate(ChemicalMixture mixture);
+
+    /**
+     * Generate rate expression as a lambda function.
+     * @param mixture ChemicalMixture object.
+     * @return lambda function (following CHG4343_Design_Project_Mathematical.Function interface)
+     */
+    public abstract Function generateRateExpression(ChemicalMixture mixture);
+
+    /**
+     * Custom data validator.
+     * @param reactants array of reactants species.
+     * @param products array of product species.
+     * @param reactantsStoichiometry array of reactant stoichiometries.
+     * @param productsStoichiometry array of product stoichiomnetries.
      */
     private static void validateData(ChemicalSpecies[] reactants, ChemicalSpecies[] products, double[] reactantsStoichiometry,
-                                     double[] productsStoichiometry) throws ArrayException {
-        if (reactants == null) throw new ArrayException("List of reactants was found to be null in " +
-                    "reaction object.", new NullPointerException("Array reactants is null"));
-        if (products == null) throw new ArrayException("List of products was found to be null in " +
-                    "reaction object.", new NullPointerException("Array products is null"));
-        if (reactantsStoichiometry == null) throw new ArrayException("List of reactant stoichiometries was found to be null in " +
-                    "in reaction object.", new NullPointerException("Array reactantsStoichiometry is null"));
-        if (productsStoichiometry == null) throw new ArrayException("List of product stoichiometries was found to be null in " +
-                    "in reaction object.", new NullPointerException("Array productsStoichiometry is null"));
+                                     double[] productsStoichiometry) {
+        // Check for nulls
+        if (reactants == null) throw new IllegalArgumentException("Invalid reactant array encountered while initializing chemical reaction object");
+        if (products == null) throw new IllegalArgumentException("Invalid products array encountered while initializing chemical reaction object");
+        if (reactantsStoichiometry == null) throw new IllegalArgumentException("Invalid reactant stoichiometry array encountered " +
+                "while initializing chemical reaction object");
+        if (productsStoichiometry == null) throw new IllegalArgumentException("Invalid product stoichiometry array encountered " +
+                "while initializing chemical reaction object");
+        // Check for length mismatches
         if (reactants.length != reactantsStoichiometry.length) {
-            throw new ArrayException("Length of array reactants does not match array reactant stoichiometry.",
-                    new LengthMismatch("Related arrays' lengths mismatch.", reactants.length, reactantsStoichiometry.length));
+            throw new ArrayException("Length of reactants array does not match the length of reactant stoichiometries array.");
         }
         if (products.length != productsStoichiometry.length) {
-            throw new ArrayException("Length of array products does not match array reactant stoichiometry.",
-                    new LengthMismatch("Related arrays' lengths mismatch.", products.length, productsStoichiometry.length));
+            throw new ArrayException("Length of products array does not match the length of product stoichiometries array.");
         }
+        // Check for same species in reactants and products
+        List<ChemicalSpecies> productList = Arrays.asList(products);
+        for(int i = 0; i < reactants.length; i++) {
+            if(productList.contains(reactants[i])) throw new ArrayException("Reactants and products arrays contain same specie");
+        }
+        // Check for invalid data in the arrays
         for (int i = 0; i < reactants.length; i++) {
             if (reactants[i] == null)
-                throw new ArrayException("Reactant at index " + i + " is null.", new InvalidArrayDataException(i));
-            //add here one for the others since they are arrays of objects
-            if (0 < reactantsStoichiometry[i]) throw new ArrayException("Stoichiometry at index " + i + " is invalid.",
-                    new InvalidArrayDataException(new NumericalException("Positive stoichiometry value for reactants are not allowed."), i));
+                throw new ArrayException("Reactant at index " + i + " is invalid.");
+            if (0 < reactantsStoichiometry[i]) throw new ArrayException("Reactant stoichiometry at index " + i + " is invalid.");
         }
         for (int i = 0; i < products.length; i++) {
             if (products[i] == null)
-                throw new ArrayException("Products at index " + i + " is null.", new InvalidArrayDataException(i));
-            //add here one for the others since they are arrays of objects
-            if (productsStoichiometry[i] < 0) throw new ArrayException("Stoichiometry at index " + i + " is invalid.",
-                    new InvalidArrayDataException(new NumericalException("Negative stoichiometry value for products are not allowed."), i));
+                throw new ArrayException("Products at index " + i + " is invalid.");
+            if (productsStoichiometry[i] < 0) throw new ArrayException("Product stoichiometry at index " + i + " is invalid.");
         }
     }
 }

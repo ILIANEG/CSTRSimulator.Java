@@ -6,6 +6,7 @@ public class Signal {
 
     public Signal(double time, double value)
     {
+        if(time < 0) throw new IllegalArgumentException("Time can not be negative");
         this.time = time;
         this.value = value;
     }
@@ -24,8 +25,6 @@ public class Signal {
     public boolean equals(Object comparator)
     {
         if(comparator == null || comparator.getClass() != this.getClass()) return false;
-        if(((Signal)comparator).time!= this.time) return false;
-        if(((Signal)comparator).value != this.time) return false;
-        return true;
+        return ((Signal) comparator).time == this.time && ((Signal) comparator).value == this.time;
     }
 }

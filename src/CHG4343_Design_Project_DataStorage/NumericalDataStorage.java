@@ -1,20 +1,17 @@
 package CHG4343_Design_Project_DataStorage;
 
 import CHG4343_Design_Project_CustomExcpetions.ArrayException;
-import CHG4343_Design_Project_CustomExcpetions.EmptyArray;
-import CHG4343_Design_Project_CustomExcpetions.LengthMismatch;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 public class NumericalDataStorage {
-    public final String[] headers;
+    private final String[] headers;
     private LinkedList<String[]> numericalData;
     public NumericalDataStorage(String[] headers) throws ArrayException {
-        if(headers == null || headers.length == 0) throw new ArrayException("Headers array in data storage object is empty", new EmptyArray(headers));
+        if(headers == null || headers.length == 0) throw new ArrayException("Headers array in data storage object is empty");
         this.headers = new String[headers.length];
         for(int i = 0; i < headers.length; i++) {
             this.headers[i] = headers[i];
@@ -34,9 +31,7 @@ public class NumericalDataStorage {
     public void addDataRow(double[] dataRow) throws ArrayException {
         if(dataRow == null) throw new ArrayException("Empty data is added to the Numerical Data Storage",
                 new NullPointerException("Data row in Numerical Data Storage is null"));
-        if(this.headers.length != dataRow.length) throw new ArrayException("Attempting to add a data row that does not match headers",
-                new LengthMismatch("dataRow array has length of ["+ dataRow.length+"], while headers array have length of [" +this.headers.length+"]",
-                dataRow.length, this.headers.length));
+        if(this.headers.length != dataRow.length) throw new ArrayException("Attempting to add a data row that does not match headers");
         String[] convertedData = new String[dataRow.length];
         for(int i = 0; i < dataRow.length; i++) {
             convertedData[i] = ((Double) dataRow[i]).toString();
